@@ -1,0 +1,32 @@
+############################################## THREE HORIZONTAL ##########################################################
+
+import("stdfaust.lib");
+q = hslider("q",5,1,30,0.1);
+gain = hslider("gain",1,0,1,0.01);
+ctFreq = hslider("cutoffFrequency",500,50,10000,0.01);
+process = no.noise : fi.resonlp(ctFreq,q,gain);
+
+
+####################################### TWO VERTICAL AND ONE HORIZONTAL ###############################################
+
+import("stdfaust.lib");
+q = vslider("q",5,1,30,0.1);
+gain = vslider("gain",1,0,1,0.01);
+ctFreq = hslider("cutoffFrequency",500,50,10000,0.01);
+process = no.noise : fi.resonlp(ctFreq,q,gain);
+
+ ####################################### TWO KNOBS, ONE SLIDER ###############################################
+
+import("stdfaust.lib");
+q = hslider("q[style:knob]",5,1,30,0.1);
+gain = hslider("gain[style:knob]",1,0,1,0.01);
+ctFreq = hslider("cutoffFrequency",500,50,10000,0.01);
+process = no.noise : fi.resonlp(ctFreq,q,gain);
+
+  ####################################### ON KNOB, TWO SLIDERS ###############################################
+
+import("stdfaust.lib");
+q = hslider("q[style:knob]",5,1,30,0.1);
+gain = hslider("gain",1,0,1,0.01);
+ctFreq = hslider("cutoffFrequency",500,50,10000,0.01);
+process = no.noise : fi.resonlp(ctFreq,q,gain);
