@@ -1,0 +1,330 @@
+
+            <script src="https://wasabi.i3s.unice.fr/WebAudioPluginBank/bower_components/webaudio-controls2/webcomponents-lite.js"></script>
+            <script>
+            WebAudioControlsOptions = {
+                useMidi: 1,
+            };
+            </script>
+            <script src="https://wasabi.i3s.unice.fr/WebAudioPluginBank/bower_components/webaudio-controls2/webaudio-controls.js"></script>
+        <template><style>	
+                        .pedal{
+                            display: block;
+                            background-color: #7caeff;
+                            width: 170px;
+                            height: 370px;
+                            border-radius: 10px;
+                            position: relative;
+                            /* bring your own prefixes */
+                        }
+            
+                        
+                        #background-image {
+                            //border: solid 2px black;
+                            width: 170px;
+                            height: 370px;
+                            opacity: 1;
+                        }
+
+                        #resize {
+                            position: absolute;
+                            cursor: nwse-resize;
+                            width: 10px;
+                            height: 10px;
+                            left: 162px;
+                            top: 362px;
+                            border: 1px solid black;
+                        }
+
+                        .knob, .switch, .icon, .label, .slider {
+                            position: absolute;
+                            cursor: pointer;
+                            text-align: center;
+                        }
+
+                    
+
+                        .selected {
+                            border: 1px dashed black;
+                            cursor: move;
+                        }
+
+                        .selected:hover {
+                            border: 1px dashed black;
+                            cursor: move;
+                        }
+
+                        .selected  webaudio-knob{
+                            cursor: move;
+                        }
+
+                        .selected  webaudio-switch{
+                            cursor: move;
+                        }
+
+                        .selected  span{
+                            cursor: move;
+                        }
+
+                        .selected:hover  span{
+                            cursor: move;
+                        }
+
+                        .selected  webaudio-slider{
+                            cursor: move;
+                        }
+
+                        .selected:hover webaudio-knob{
+                            cursor: move;
+                        }
+
+                        .selected:hover webaudio-switch{
+                            cursor: move;
+                        }
+                        
+                        .selected:hover webaudio-slider{
+                            cursor: move;
+                        }
+
+
+                        #switch1 {
+                            bottom: 10px;
+                            right: 0px;
+                        }
+                        
+                    #bypass {
+                        left: 45px;
+                        top: 290px;
+                    }
+
+                    #bypass div {
+                        color: #000000;
+                        font-family: "Verdana";
+                        font-size: 14px;
+                        
+                    }
+                
+                    #BasePitch {
+                        left: 10px;
+                        top: 10px;
+                    }
+
+                    #BasePitch div {
+                        color: #000000;
+                        font-family: "Verdana";
+                        font-size: 14px;
+                        
+                    }
+                
+                    #Mix {
+                        left: 10px;
+                        top: 80px;
+                    }
+
+                    #Mix div {
+                        color: #000000;
+                        font-family: "Verdana";
+                        font-size: 14px;
+                        
+                    }
+                
+                    #PitchMod {
+                        left: 10px;
+                        top: 150px;
+                    }
+
+                    #PitchMod div {
+                        color: #000000;
+                        font-family: "Verdana";
+                        font-size: 14px;
+                        
+                    }
+                
+                    #Release {
+                        left: 10px;
+                        top: 220px;
+                    }
+
+                    #Release div {
+                        color: #000000;
+                        font-family: "Verdana";
+                        font-size: 14px;
+                        
+                    }
+                
+                        
+                        .pedalLabel{
+                            position: absolute;
+                            top: 225px;
+                            font-size: 25px;
+                            font-family: Sansita;/*{font}*/
+                            text-align: center;
+                            line-height: 30px;/*{pedalfontsize}*/
+                            width: 150px;
+                            color: #6B0000;/*{fontcolor}*/
+                        }
+                        .knob-label{
+                            position: absolute;
+                            font-size: 12px;/*{knobfontsize}*/
+                            line-height: 12px;
+                            width:64px;
+                            max-width:64px;
+                            overflow: hidden;
+                            text-align: center;
+                            font-family: Sansita;/*{font}*/
+                            color: #6B0000;/*{fontcolor}*/
+                        }
+                        #knob1-label{
+                            top: 84px;
+                            left: 43px;
+                        }</style><div class="pedal">
+		<div id="resize"></div>
+
+		<img id="background-image">
+
+	<div class="switch" id="bypass"><webaudio-switch src="./img/switches/switch_2.png" height="50" width="80" id="switch1" style="height: 50px;"></webaudio-switch><div>bypass</div></div><div class="slider" id="BasePitch"><webaudio-slider value="60" height="40" width="150" max="96" min="24" src="./img/sliders/slider1.png" knobsrc="./img/sliders/sliderKnob.png" id="/blipper3/BasePitch" style="height: 40px;"></webaudio-slider><div>BasePitch</div></div><div class="slider" id="Mix"><webaudio-slider value="0.5" height="40" width="150" max="1" min="0" src="./img/sliders/slider1.png" knobsrc="./img/sliders/sliderKnob.png" id="/blipper3/Mix" style="height: 40px;"></webaudio-slider><div>Mix</div></div><div class="slider" id="PitchMod"><webaudio-slider value="24" height="40" width="150" max="64" min="-64" src="./img/sliders/slider1.png" knobsrc="./img/sliders/sliderKnob.png" id="/blipper3/PitchMod" style="height: 40px;"></webaudio-slider><div>PitchMod</div></div><div class="slider" id="Release"><webaudio-slider value="20" height="40" width="150" max="100" min="2" src="./img/sliders/slider1.png" knobsrc="./img/sliders/sliderKnob.png" id="/blipper3/Release" style="height: 40px;"></webaudio-slider><div>Release</div></div></div></template><script>
+        let blipper3Temp = document.currentScript.ownerDocument.querySelector('template');
+        class blipper3Gui extends HTMLElement {
+    
+        
+            constructor(plug) {
+               
+                super();
+                this._plug = plug;
+                this._plug.gui = this;
+                console.log(this._plug);
+                this._root = this.attachShadow({ mode: 'open' });
+                this._root.appendChild(blipper3Temp.content.cloneNode(true));
+                this.isOn;
+                this.state = new Object();
+                this.setKnobs();
+                this.setSliders();
+                this.setSwitchListener();
+                this.setActive(false);
+        
+            }
+        
+            attributeChangedCallback() {
+               
+            console.log("Custom element attributes changed.");
+            this.state = JSON.parse(this.getAttribute('state'));
+            let tmp = "/blipper3/bypass";
+            if (this.state[tmp] == 1) {
+            this._root.querySelector("#switch1").value = 0;
+            this.isOn = false;
+            } else if (this.state[tmp] == 0) {
+            this._root.querySelector("#switch1").value = 1;
+            this.isOn = true;
+            }
+            this.knobs = this._root.querySelectorAll(".knob");
+            console.log(this.state);
+            for (var i = 0; i < this.knobs.length; i++) {
+                    this.knobs[i].setValue(this.state[this.knobs[i].id],false);
+            console.log(this.knobs[i].value);
+            }
+        
+            }
+        
+            get properties() {
+               
+            this.boundingRect = {
+                dataWidth: {
+                type: Number,
+                value: 170
+                },
+                dataHeight: {
+                type: Number,
+                value: 370
+                }
+          };
+          return this.boundingRect;
+        
+            }
+        
+            static get observedAttributes() {
+               
+                return ['state'];
+        
+            }
+        
+            setResources() {
+               
+            // Sets the background image and style.
+            var background = this._root.querySelector('img');
+            background.src = this._plug.URL + '/assets/undefined';
+            background.style = 'border-radius : 10px;'
+
+            this._root.querySelectorAll(".knob").forEach((knob) => {
+				knob.querySelector("webaudio-knob").setAttribute('src', this._plug.URL + '/assets/MiniMoog_Main.png');
+            });
+            
+            this._root.querySelectorAll(".switch").forEach((s) => {
+				s.querySelector("webaudio-switch").setAttribute('src', this._plug.URL + '/assets/switch_1.png');
+            });
+            
+            
+        
+            }
+        
+            setKnobs() {
+               
+            }
+        
+            bypass() {
+               
+            this._plug.setParam("/blipper3/bypass", 1);
+            console.log("disabled");
+        
+            }
+        
+            setSwitchListener() {
+               
+            console.log("setswitch");
+            this._root.querySelector("#switch1").addEventListener('change', (e) => {
+                if (this.isOn) this.bypass()
+                else this.reactivate();
+                this.isOn = !this.isOn;
+            });
+        
+            }
+        
+            reactivate() {
+               
+            this._plug.setParam("/blipper3/bypass", 0);
+        
+            }
+        
+            setSliders() {
+               this._root.getElementById("/blipper3/BasePitch").addEventListener("input", (e) =>this._plug.setParam("/blipper3/BasePitch", e.target.value));
+this._root.getElementById("/blipper3/Mix").addEventListener("input", (e) =>this._plug.setParam("/blipper3/Mix", e.target.value));
+this._root.getElementById("/blipper3/PitchMod").addEventListener("input", (e) =>this._plug.setParam("/blipper3/PitchMod", e.target.value));
+this._root.getElementById("/blipper3/Release").addEventListener("input", (e) =>this._plug.setParam("/blipper3/Release", e.target.value));
+
+            }
+        
+            setActive(active) {
+               
+                if (active == undefined || active == false) {
+                    this.isOn = false;
+                    this.bypass();
+                    this._root.querySelector("#switch1").value = 0;
+                } else if (active) {
+                    this.isOn = true;
+                    this.reactivate();
+                    this._root.querySelector("#switch1").value = 1;
+                }
+        
+            }
+        }
+                try {
+                    customElements.define('wap-blipper3', blipper3Gui);
+                    console.log("Element defined");
+                } catch(error){
+                    console.log(error);
+                    console.log("Element already defined");      
+                }
+                
+                createblipper3GUI = (plug) => {
+                    let elem = new blipper3Gui(plug);
+                    return elem; 
+                }
+        </script>
