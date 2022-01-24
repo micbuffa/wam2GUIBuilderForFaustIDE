@@ -1,0 +1,3191 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Cache-Control" content="no-store" />
+
+    <script
+        src="https://mainline.i3s.unice.fr/WebAudioPluginBank/bower_components/webaudio-controls2/webcomponents-lite.js">
+    </script>
+
+
+    <script src="faust/faustUIParser.js"></script>
+    <script>
+        let importsLoaded = false;
+
+        function handleLoad(e) {
+            //console.log("file imported : " + e.target.href);
+            importsLoaded = true;
+        }
+    </script>
+<!--
+    <link rel="import" href="pedal_models/pedal.html" onload="handleLoad(event)">
+
+    <link rel="import" href="editor-components/editor-pedal-details/editor-pedal-details.html">
+    <link rel="import" href="editor-components/editor-pedal-details/pedal-elem-previews.html">
+    <link rel="import" href="editor-components/editor-element-list.html">
+    <link rel="import" href="editor-components/editor-inspector.html">
+    <link rel="import" href="editor-components/editor-faust/editor-faust.html">
+    <link rel="import" href="editor-components/editor-pedal-new/editor-pedal-new-1.html">
+-->
+    <script src="./bower_components/webaudio-controls/webaudio-controls.js"></script>
+    <script src="lib/webaudio-controls.js"></script>
+    <script src="lib/WebAudioSDK.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"></script>
+    <script src="lib/jquery-3.1.1.min.js"></script>
+
+    <link rel="stylesheet" href="css/bootstrap-4.4.1/bootstrap.min.css">
+    <script src="lib/bootstrap-4.4.1/bootstrap.min.js"></script>
+
+    <link rel="stylesheet" href="css/StyleSheet.css">
+    <link rel="stylesheet" href="css/StyleSideNav.css">
+    <link rel="stylesheet" href="css/index_css.css">
+    <link rel="Stylesheet" href="css/SideBar.css">
+    <link rel="Stylesheet" href="css/police_select.css">
+    <link rel="Stylesheet" href="new_editor/css/style.css">
+
+    <script src="pedal_models/functionalPedalGenerator.js"></script>
+    <script src="pedal_models/functionalPedalGeneratorMichelWam2.js"></script>
+    <script src="lib/interact.min.js"></script>
+    <script src="lib/TweenMax.min.js"></script>
+    <script src="lib/TextPlugin.min.js"></script>
+    <!--
+    <script src='https://kit.fontawesome.com/a076d05399.js'></script>
+    -->
+    <script src="./lib/jscolor.js"></script>
+    <script src="./lib/tinycolor.js"></script>
+
+    <link
+        href="https://fonts.googleapis.com/css?family=Abril+Fatface|Belgrano|Bevan|Bungee+Inline|Bungee+Shade|Calligraffitti|Mogra|Nothing+You+Could+Do|Orbitron|Pangolin|Rock+Salt|Sansita|Shojumaru|UnifrakturMaguntia|VT323"
+        rel="stylesheet">
+    <link rel=stylesheet href="font-awesome/css/font-awesome.min.css">
+
+    <script type="module" src="./new_editor/js/layout/script.js"></script>
+
+    <title>Pedal Creator 0.1</title>
+    <style>
+        h2,
+        h3 {
+            margin: 0 0 6px;
+            font-size: 150%;
+            font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+        }
+
+        #box {
+            width: 40%;
+            float: left;
+            padding: 16px;
+            margin: 25px
+        }
+
+        .boxshadow {
+            border-radius: 8px;
+            border: 1px solid #fff;
+            background: #ddd;
+        }
+
+        a.button {
+            cursor: pointer
+        }
+
+        .row0,
+        .row1 {
+            padding: 3px
+        }
+
+        .row1 {
+            background: #222
+        }
+
+        .minus,
+        .plus {
+            background: silver;
+            background-image: linear-gradient(to bottom, #eee 0%, #ddd 50%, #bbb 50%, #ddd 100%);
+            color: #111;
+            font-weight: bold;
+            padding: 2px 3px;
+            display: inline-block;
+            width: 15px;
+            cursor: pointer;
+            text-align: center;
+            border-radius: 2px
+        }
+
+        #settings {
+            float: right;
+            width: 170px;
+            background: #EEE;
+            padding: 5px;
+            border: 1px solid white;
+            box-shadow: 0px 0px 5px #888;
+            font-size: 85%;
+            line-height: 1.1em
+        }
+
+        #settings input {
+            margin: 0;
+            line-height: 1.1em
+        }
+
+        #settings h4 {
+            font-weight: bold;
+            margin-bottom: 3px
+        }
+
+        .codebox {
+            padding: 15px;
+            background: #ffc;
+            border: 1px dotted #ccc;
+        }
+
+        #snippet {
+            font-style: italic
+        }
+
+        .swatch {
+            width: 30px;
+            height: 30px;
+            display: inline-block;
+            background: #e2001a;
+            margin-right: 20px;
+            cursor: pointer
+        }
+
+        hr.dotted {
+            clear: both;
+            display: block;
+            height: 0;
+            border-bottom: 1px dotted #ccc
+        }
+
+        .params {
+            width: 40%;
+            margin: 25px 10px 0;
+            border-radius: 12px;
+            border: 8px solid #04d3ff;
+            background-color: #111;
+            padding: 8px;
+            float: right;
+            color: #999;
+            font-size: 80%;
+        }
+
+
+
+        .center {
+            text-align: center;
+        }
+
+        .menu {
+            width: 200px;
+            z-index: 1;
+            box-shadow: 0 4px 5px 3px rgba(0, 0, 0, 0.2);
+            position: fixed;
+            display: none;
+            transition: 0.2s display ease-in;
+        }
+
+        .menu-options {
+            list-style: none;
+            padding: 10px 0;
+            z-index: 1;
+        }
+
+        .menu-option {
+            font-weight: 500;
+            z-index: 1;
+            font-size: 14px;
+            padding: 10px 40px 10px 20px;
+            border-bottom: 1.5px solid rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+        }
+
+
+
+
+        button {
+            background: grey;
+            border: none;
+        }
+
+        .next {
+            color: green;
+        }
+
+
+        .next {
+            color: red;
+            animation: move 0.5s;
+            animation-iteration-count: 2;
+        }
+
+
+
+        @keyframes move {
+            from {
+                transform: translate(0%);
+            }
+
+            50% {
+                transform: translate(-40%);
+            }
+
+            to {
+                transform: transform(0%);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+
+    <!-- Pedal section -->
+    <main class="pedalSection"></main>
+    <div class="container"></div>
+
+    <nav class="navbar navbar-expand navbar-dark bg-dark"> <a href="#menu-toggle" id="menu-toggle"
+            class="navbar-brand"><span class="navbar-toggler-icon"></span></a> <button class="navbar-toggler"
+            type="button" data-toggle="collapse" data-target="#navbarsExample02" aria-controls="navbarsExample02"
+            aria-expanded="false" aria-label="Toggle navigation"> <span class="navbar-toggler-icon"></span> </button>
+        <div class="collapse navbar-collapse" id="navbarsExample02">
+            <ul class="navbar-nav mr-auto">
+                <!--
+                <li class="nav-item active"> <a class="nav-link" href="#" id="removeLink"
+                        onclick="removeDOMElement()"><i class="fa fa-trash"></i></a> </li>
+                
+                <li class="nav-item active"> <a class="nav-link" href="#"><i class="fa fa-download"></i></a> </li>
+                -->
+                <li>
+                    <button type="button" class="btn btn-light" onclick="toggleFullScreen()">FULL SCREEN</button>
+
+                </li>
+                <li>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp</li>
+                <li class="nav-item active">
+                    <button type="button" class="btn btn-light" onclick="savePedal('WAM2')">PUBLISH / PREVIEW PLUGIN WAM2</button>
+                </li>
+                <li>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp</li>
+		<!--
+                <li class="nav-item active">
+                    <button type="button" class="btn btn-light" onclick="savePedal('WAP')">PUBLISH / PREVIEW PLUGIN WAP</button>
+                </li>
+		-->
+                <!--
+
+                <li class="nav-item active"> <a class="nav-link" href="#"
+                        onclick="window.open('faust-editor','popUpWindow','height=500,width=400,left=100,top=100,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no, status=yes');"><i
+                            class="fa fa-pencil"></i></a> </li>
+                <li class="nav-item active"> <a class="nav-link" data-toggle="modal" data-target="#myModal"
+                        href="#myModal"><i class="fa fa-plus-circle"></i></a></li>
+                <li class="nav-item active"> <a class="nav-link" href="#" onclick="window.location.reload();"><i
+                            class="fa fa-home"></i> <span class="sr-only">(current)</span></a> </li>
+                 -->
+            </ul>
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active"> <a class="nav-link" href="#"></a> </li>
+                <li class="nav-item active"> <a class="nav-link" href="#"></a> </li>
+            </ul>
+            <form class="form-inline my-2 my-md-0"> </form>
+        </div>
+    </nav>
+
+
+    <div class="area"></div>
+    <nav class="main-menu">
+        <ul style="direction: ltr;">
+
+            <!--
+            <li class="has-subnav">
+                <a data-toggle="modal" data-target="#myModal4" href="#myModal">
+                    <i class="fa fa-truck fa-2x"></i>
+                    <span class="nav-text">
+                        Preview Plugin
+                    </span>
+                </a>
+            </li>
+            -->
+            <!--
+            <li>
+                <a href="#" onclick="drawRectangle()">
+                    <i class="fa fa-pencil fa-2x"></i>
+                    <span class="nav-text">
+                        Draw
+                    </span>
+                </a>
+
+            </li>
+
+            <li class="has-subnav">
+                <a data-toggle="modal" data-target="#myModal3" href="#myModal">
+                    <i class="fa fa-mouse-pointer fa-2x"></i>
+                    <span class="nav-text">
+                        
+                    </span>
+                </a>
+
+            </li>
+
+
+
+            <li class="has-subnav">
+                <a data-toggle="modal" data-target="#myModal5" href="#myModal">
+                    <i class="fa fa-cog fa-2x"></i>
+                    <span class="nav-text">
+                        Pedal Parameters
+                    </span>
+                </a>
+            </li>
+-->
+            <!-- <li class="has-subnav">
+                <a href="#" onclick="toggleLabelMenu()" id="LabelMenu">
+                    <i class="fa fa-font fa-2x"></i>
+                    <span class="nav-text">
+                        Label Parameters
+                    </span>
+                </a>
+            </li> -->
+            <!--
+            <li class="has-subnav">
+                <a href="#" onclick="toggleLabelMenuFunction()" id="LabelMenu">
+                    <i class="fa fa-font fa-2x"></i>
+                    <span class="nav-text">
+                        Label Parameters
+                    </span>
+                </a>
+            </li>
+            -->
+            <li class="has-subnav">
+                <a href="#" onclick="toggleGradientMenuFunction()" id="GradientMenu">
+                    <i class="fa fa-barcode fa-2x"></i>
+                    <span class="nav-text">
+                        Gradient Menu
+                    </span>
+                </a>
+            </li>
+            <li class="has-subnav">
+                <a href="#" onclick="togglePreSetsFunction()" id="PresetsMenu">
+                    <i class="fa fa-adjust fa-2x"></i>
+                    <span class="nav-text">
+                        Shadow menu
+                    </span>
+                </a>
+            </li>
+
+            <!--
+            <li class="has-subnav">
+                <a href="#" onclick="toggleShadowMenuFunction()" id="ShadowMenu">
+                    <i class="fa fa-tasks fa-2x"></i>
+                    <span class="nav-text">
+                        Toggle Shadow Menu
+                    </span>
+                </a>
+            </li>
+            -->
+
+            <!--
+            <li class="has-subnav">
+                <a href="#" onclick="toggleTextureMenuFunction()" id="TextureMenu">
+                    <i class="fa fa-tint fa-2x"></i>
+                    <span class="nav-text">
+                        Toggle Texture Menu
+                    </span>
+                </a>
+            </li>
+
+            <li class="has-subnav">
+                <a href="#" onclick="toggleImageMenuFunction()" id="ImageMenu">
+                    <i class="fa fa-image fa-2x"></i>
+                    <span class="nav-text">
+                        Toggle Image Menu
+                    </span>
+                </a>
+            </li>
+            -->
+            <!--
+            <li class="has-subnav">
+                <a href="#" onclick="toggleKnobMenuFunction()" id="KnobMenu">
+                    <i class="fa fa-circle-notch fa-2x"></i>
+                    <span class="nav-text">
+                        Toggle Knob Menu
+                    </span>
+                </a>
+            </li>
+            -->
+            <!--
+            <li class="has-subnav">
+                <a href="#" onclick="toggleDivMenuFunction()" id="DivMenu">
+                    <i class="fa fa-square fa-2x"></i>
+                    <span class="nav-text">
+                        Toggle Div Menu
+                    </span>
+                </a>
+            </li>
+            -->
+        </ul>
+
+
+    </nav>
+
+
+    <div class="params draggables" id="labelmenuid" style="display: none; direction: ltr;">
+        <h3>Label parameters</h3>
+
+        <div class="row0">
+            <select id='select' onChange="changeLabelFont(this);"
+                style="direction: ltr; width: 80px; position: relative;">
+            </select>
+            <label>Select Label Font</label>
+        </div>
+        <div class="row1">
+            <select id="sel1" onchange="changeSize(this);" style="direction: ltr; width: 35px; position: relative;">
+                <option>4</option>
+                <option>8</option>
+                <option>12</option>
+                <option>16</option>
+                <option>20</option>
+                <option>24</option>
+                <option>28</option>
+                <option>32</option>
+                <option>36</option>
+                <option>40</option>
+                <option>44</option>
+                <option>48</option>
+                <option>52</option>
+                <option>56</option>
+                <option>58</option>
+            </select>
+            <label>Select Label Size</label>
+        </div>
+        <div class="row0" id="left" style="float: left; width: 50%;">
+            <a href="#" onclick="fontSizeX()" id="fontSizeX"><i class="fas fa-plus" style="color: white;"></i></a>
+            <label>Increase Label Size</label>
+        </div>
+        <div class="row0" id="right" style="float: right; width: 50%;">
+            <a href="#" onclick="fontSizeY()" id="fontSizeY"><i class="fas fa-minus" style="color: white;"></i></a>
+            <label>Decrease Label Size</label>
+        </div>
+        <div class="row1" id="left" style="float: left; width: 50%;">
+            <a href="#" id="boldid" onclick="BoldStyle()"><i class="fa fa-bold"
+                    style="color: white; width: 20px;"></i></a>
+            <label>Bold Label Style</label>
+        </div>
+        <div class="row1" id="right" style="float: right; width: 50%;">
+            <a href="#" id="underlineid" onclick="UnderlineStyle()"><i class="fa fa-underline"
+                    style="color: white; width: 20px;"></i></a>
+            <label>Underline Label Style</label>
+        </div>
+
+        <div class="row0" id="left" style="float: left; width: 50%;">
+            <a href="#" id="griplinesid" onclick="GripLinesStyle()"><i class="fas fa-grip-lines"
+                    style="color: white; width: 20px;"></i></a>
+            <label>GripLine Label Style</label>
+        </div>
+
+        <div class="row0" id="right" style="float: right; width: 50%;">
+            <input type="submit" class="jscolor" style="direction: ltr; width: 80px;" id="jscolorpick"
+                onchange="changeColor(this);">
+            <label>Label Color</label>
+        </div>
+        <div class="row1" id="left" style="float: left; width: 50%;">
+            <a href="#" type="submit" class="btn btn-primary" onclick="moveLabelXLeft()" id="moveLabelXLeft">&larr;</a>
+            <label>Move Label Left</label>
+        </div>
+        <div class="row1" id="right" style="float: right; width: 50%;">
+            <a href="#" type="submit" class="btn btn-primary" onclick="moveLabelYDown()" id="moveLabelYDown">&darr;</a>
+            <label>Move Label Down</label>
+        </div>
+        <div class="row0" id="left" style="float: left; width: 50%;">
+            <a href="#" type="submit" class="btn btn-primary" onclick="moveLabelXRight()"
+                id="moveLabelXRight">&rarr;</a>
+            <label>Move Label Right</label>
+        </div>
+        <div class="row0" id="right" style="float: right; width: 50%;">
+            <a href="#" type="submit" class="btn btn-primary" onclick="moveLabelYUp()" id="moveLabelYUp">&uarr;</a>
+            <label>Move Label Up</label>
+        </div>
+    </div>
+
+
+    <div class="menu" id="menu">
+        <a href="#" id="closeLink" onclick="closeMenu()"><i class="fas fa-times fa-2x" style="float: right; color: red; position: absolute; top: -15px;
+                right: -10px;"></i></a>
+        <ul class="menu-options">
+            <li class="menu-option" style="list-style-type: none;">
+                <div style="display: inline-block; direction: ltr;">
+                    <select id='select' onChange="changeLabelFont(this);"
+                        style="direction: ltr; width: 80px; position: relative;">
+                    </select>
+                    <select id="sel1" onchange="changeSize(this);"
+                        style="direction: ltr; width: 35px; position: relative;">
+                        <option>4</option>
+                        <option>8</option>
+                        <option>12</option>
+                        <option>16</option>
+                        <option>20</option>
+                        <option>24</option>
+                        <option>28</option>
+                        <option>32</option>
+                        <option>36</option>
+                        <option>40</option>
+                        <option>44</option>
+                        <option>48</option>
+                        <option>52</option>
+                        <option>56</option>
+                        <option>58</option>
+                    </select>
+                    <a href="#" onclick="fontSizeX()" id="fontSizeX"><i class="fas fa-plus"
+                            style="color: black;"></i></a>
+                    <a href="#" onclick="fontSizeY()" id="fontSizeY"><i class="fas fa-minus"
+                            style="color: black;"></i></a>
+                </div>
+
+                <div style="display: inline-block; direction: ltr;">
+                    <a href="#" id="boldid" onclick="BoldStyle()"><i class="fa fa-bold"
+                            style="color: black; float: left; width: 20px;"></i></a>
+                    <a href="#" id="underlineid" onclick="UnderlineStyle()"><i class="fa fa-underline"
+                            style="color: black; float: left; width: 20px;"></i></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <a href="#" id="griplinesid" onclick="GripLinesStyle()"><i class="fas fa-grip-lines"
+                            style="color: black; float: left; width: 20px;"></i></a>
+                </div>
+                <div style="display: inline-block; direction: ltr;">
+                    <input type="submit" class="jscolor" style="direction: ltr; width: 80px;" id="jscolorpick"
+                        onchange="changeColor(this);">
+                </div>
+                <br>
+                <br>
+                <div style="display: inline-block; direction: ltr;">
+                    <a href="#" type="submit" class="btn btn-default" onclick="moveLabelXLeft()"
+                        id="moveLabelXLeft">&larr;</a>
+                    <a href="#" type="submit" class="btn btn-default" onclick="moveLabelYDown()"
+                        id="moveLabelYDown">&darr;</a>
+                    <a href="#" type="submit" class="btn btn-default" onclick="moveLabelXRight()"
+                        id="moveLabelXRight">&rarr;</a>
+                    <a href="#" type="submit" class="btn btn-default" onclick="moveLabelYUp()"
+                        id="moveLabelYUp">&uarr;</a>
+                </div>
+            </li>
+        </ul>
+    </div>
+
+
+
+
+
+
+    <div id="myModal5" class="modal fade" role="dialog">
+        <div class="modal-dialog" style="background-color: #333;">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header" style="background-color: #333;">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title" style="color: blanchedalmond;">Pedal Parameters</h4>
+                </div>
+                <div class="modal-body" style="background-color: #333;">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="textinput" style="color: white;">Name</label>
+                        <div class="col-sm-7" style="float: left;">
+                            <input type="text" placeholder="Input Name" id="nompedal" class="form-control">
+                        </div>
+                        <div class="col-sm-2">
+                            <button type="submit" class="btn btn-primary" onclick="submitChangeName()"
+                                id="submitlink">Submit</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="textinput" style="color: white;">Label</label>
+                        <div class="col-sm-7" style="float: left;">
+                            <input type="text" placeholder="Input Name" id="labelpedal" class="form-control">
+                        </div>
+                        <div class="col-sm-2">
+                            <button type="submit" class="btn btn-primary" onclick="submitChangeLabel()"
+                                id="submitlink">Submit</button>
+                        </div>
+                    </div>
+
+                    <!-- <div class="form-group" style="direction: ltr; float: right;">
+                <button type="submit" class="btn btn-primary" onclick="submitChange()" id="submitlink">Submit</button>
+            </div> -->
+                </div>
+
+            </div>
+            <!--  <div class="modal-footer" style="background-color: #333;" style="direction: ltr; float: right;">
+            <button type="submit" class="btn btn-primary" onclick="submitChange()" id="submitlink">Submit</button>
+        </div> -->
+        </div>
+
+    </div>
+    </div>
+
+
+
+    <div id="myModal4" class="modal fade" role="dialog">
+        <div class="modal-dialog" style="background-color: #333;">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header" style="background-color: #333;">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title" style="color: blanchedalmond;">Plugin preview</h4>
+                </div>
+                <div class="modal-body" style="background-color: #333;">
+                    <!-- <editor-pedal-new-1 width="400" height="400"></editor-pedal-new-1> -->
+
+                   <div class="container" style="direction: ltr;">
+                        <button
+                            onclick="document.querySelector('#iframeWapPreview').contentDocument.location.reload(true);">Refresh
+                            content</button>
+
+                        <a id="linkToPluginPreview" href="" target="_blank">Open in new tab</a>
+                        <button onclick="downloadWap();">Download zip</button>
+
+                        <iframe id="iframeWapPreview" src="" width="400" height="500" id="template1"></iframe>
+
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="background-color: #333;">
+                <!-- <button class="mainbtn" onclick="deleteSelectedElement()">Delete</button> -->
+                <!-- <div class="form-group">
+                <a class="btn btn-primary" onclick="removeDOMElement()">Delete</a>
+            </div> -->
+            </div>
+        </div>
+
+    </div>
+    </div>
+
+
+
+    <div id="myModal3" class="modal fade" role="dialog">
+        <div class="modal-dialog" style="background-color: #333;">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header" style="background-color: #333;">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title" style="color: blanchedalmond;">Draw Menu</h4>
+                </div>
+                <div class="modal-body" style="background-color: #333;">
+                    <!-- <editor-pedal-new-1 width="400" height="400"></editor-pedal-new-1> -->
+
+                    <!--
+                    <div class="editor-collapsible-content">
+                        <editor-inspector id="editor-inspector"></editor-inspector>
+                    </div>
+-->
+
+
+                </div>
+
+            </div>
+            <div class="modal-footer" style="background-color: #333;">
+                <!-- <button class="mainbtn" onclick="deleteSelectedElement()">Delete</button> -->
+                <!-- <div class="form-group">
+                <a class="btn btn-primary" onclick="removeDOMElement()">Delete</a>
+            </div> -->
+            </div>
+        </div>
+
+    </div>
+    </div>
+
+
+
+
+    <div id="myModal2" class="modal fade" role="dialog">
+        <div class="modal-dialog" style="background-color: #333;">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header" style="background-color: #333;">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title" style="color: blanchedalmond;">Draw Menu</h4>
+                </div>
+                <div class="modal-body" style="background-color: #333;">
+                    <!-- <editor-pedal-new-1 width="400" height="400"></editor-pedal-new-1> -->
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="select"
+                            style="color: white;"></label>&nbsp;&nbsp;&nbsp;
+                        <div class="col-sm-9">
+
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-sm-9" style="direction: ltr;">
+
+                        </div>
+                    </div>
+
+
+                    <div class="form-group">
+                        <div class="col-sm-9" style="direction: ltr;">
+
+                        </div>
+                    </div>
+
+                </div>
+
+
+
+                <div class="modal-footer" style="background-color: #333;">
+                    <div id="text">
+                        <p id="h3" style="color: white; direction: ltr; visibility: hidden;">
+
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+
+
+
+    <div id="myModal" class="modal fade" role="dialog">
+        <div class="modal-dialog" style="background-color: #333;">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header" style="background-color: #333;">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title" style="color: blanchedalmond;">New Pedal</h4>
+                </div>
+                <div class="modal-body" style="background-color: #333;">
+                    <!-- <editor-pedal-new-1 width="400" height="400"></editor-pedal-new-1> -->
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="textinput" style="color: white;">Width</label>
+                        <div class="col-sm-10">
+                            <input type="text" placeholder="Input Width" id="width" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="textinput" style="color: white;">Color</label>
+                        <div class="col-sm-10">
+                            <input type="text" style="width: 100%;" placeholder="Select Color" id="color" class="color">
+                        </div>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="textinput" style="color: white;">Height</label>
+                        <div class="col-sm-10">
+                            <input type="text" placeholder="Input Height" id="height" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="textinput" style="color: white;">Radius</label>
+                        <div class="col-sm-10">
+                            <input type="text" placeholder="Input Radius" id="radius" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="textinput" style="color: white;">Name</label>
+                        <div class="col-sm-10">
+                            <input type="text" placeholder="Input Name" id="name" name="name" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="textinput" style="color: white;">Label</label>
+                        <div class="col-sm-10">
+                            <input type="text" placeholder="Input Label" id="label" class="form-control">
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer" style="background-color: #333;">
+                    <div class="form-group">
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        <div class="pull-right">
+                            <button type="submit" class="btn btn-default" style="color: black; background-color: white;"
+                                onclick="refreshModal()">Refresh</button>
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <button type="submit" class="btn btn-primary" onclick="newPedal()">Create</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="wrapper" class="toggled">
+        <!-- Sidebar -->
+        <div id="sidebar-wrapper">
+            <div id="new-editor"></div>            
+        </div>
+
+        
+    </div>
+
+    <!-- /#sidebar-wrapper -->
+    <!-- Page Content -->
+    <div id="page-content-wrapper">
+        <div class="container-fluid">
+
+        </div>
+    </div> <!-- /#page-content-wrapper -->
+    </div>
+
+    <div style="background: white; display: none; direction: ltr;" class="params draggables" id="presetsid">
+        <h3>pre sets</h3>
+        <div style="box-shadow: 5px 5px #333" class="swatch" id="hardlight"></div>hard light
+        <hr class="dotted">
+        <div style="box-shadow: 5px 5px 3px #666" class="swatch" id="soft"></div> soft
+        <hr class="dotted">
+        <div style="box-shadow: 0px 0px 5px #444" class="swatch" id="fromabove"></div> from above
+        <hr class="dotted">
+        <div style="box-shadow: 0px 8px 6px -6px #666" class="swatch" id="reduced"></div> reduced
+        <hr class="dotted">
+        <div style="box-shadow: inset 0px 0px 10px #666" class="swatch" id="inset"></div> inset
+        <hr class="dotted">
+        <div style="box-shadow: 0px 0px 10px -2px #FFF" class="swatch" id="glow"></div> glow
+        <hr class="dotted">
+
+        <!--
+        <div style="box-shadow: 4px 5px 6px rgba(0, 0, 0, 0.7), inset -2px -2px 5px 0px rgba(0, 0, 0, 0.2), inset 3px 1px 1px 4px rgba(255, 255, 255, 0.2), 1px 0px 1px 0px rgba(0, 0, 0, 0.9), 0 2px 1px 0 rgba(0, 0, 0, 0.9), 1px 1px 1px 0px rgba(0, 0, 0, 0.9);background: linear-gradient(rgb(21, 83, 141), rgb(16, 67, 114));"
+            class="swatch" id="disto"></div> Disto
+        -->
+        <div style="box-shadow: 4px 5px 6px rgba(0, 0, 0, 0.7), inset -2px -2px 5px 0px rgba(0, 0, 0, 0.2), inset 3px 1px 1px 4px rgba(255, 255, 255, 0.2), 1px 0px 1px 0px rgba(0, 0, 0, 0.9), 0 2px 1px 0 rgba(0, 0, 0, 0.9), 1px 1px 1px 0px rgba(0, 0, 0, 0.9);"
+            class="swatch" id="disto"></div> Disto
+
+    </div>
+
+    <div class="params draggables" id="shadowmenuid" style="display: none; direction: ltr;">
+        <h3>box-shadow parameters</h3>
+
+        <div class="row0">
+            <div class="minus">-</div>
+            <input value="3" size="3" id="offX">
+            <div class="plus">+</div>
+            <label>Offset X</label>
+        </div>
+
+        <div class="row1">
+            <div class="minus">-</div>
+            <input value="3" size="3" id="offY">
+            <div class="plus">+</div>
+            <label>Offset Y</label>
+        </div>
+
+        <div class="row0">
+            <div class="minus">-</div>
+            <input value="3" size="3" id="blur">
+            <div class="plus">+</div>
+            <label>Blur</label>
+        </div>
+
+        <div class="row1">
+            <div class="minus">-</div>
+            <input value="3" size="3" id="spread">
+            <div class="plus">+</div>
+            <label>Spread</label>
+        </div>
+
+        <div class="row0" id="left" style="float: left; width: 50%;">
+            &nbsp; #<input type="submit" class="jscolor" style="direction: ltr; width: 80px;" id="jscolorshadowpick">
+            <label>Color (HEX)</label>
+        </div>
+
+        <div class="row0" id="right" style="float: right; width: 50%;">
+            <a href="#" class="btn btn-primary" onclick="changeShadowColor();" id="shadowcolorid">Set Shadow Color</a>
+        </div>
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <div class="row1">
+            <input type="checkbox" value="inset" id="insett"><label>inset</label>
+        </div>
+
+        <br />
+        <div class="row0" id="left" style="float: left; width: 50%;">
+            <button id="surprise" class="button">Surprise Me!</button>
+        </div>
+        <div class="row0" id="right" style="float: right; width: 50%;">
+            <button id="setshadow" class="button" onclick="setShadow();">Apply Shadow</button>
+        </div>
+
+    </div>
+
+    <div class="params draggables" id="gradientmenuid" style="display: none; direction: ltr;">
+        <h3>gradient parameters</h3>
+
+        <div id="left" style="float: left; width: 50%;">
+            <div class="row0">
+                <input type="color" oninput="generateGradient(event)" value="#1E6482" id="startColor">
+                <label>Start color</label>
+            </div>
+        </div>
+
+        <div id="right" style="float: right; width: 50%;">
+            <div class="row0">
+                <input type="color" oninput="generateGradient(event)" value="#1E1E1E" id="endColor">
+                <label>End Color</label>
+            </div>
+
+        </div>
+
+        <div class="row1">
+            <input type="range" oninput="generateGradient(event)" value="1" min="0" max="1" step=0.1 id="opacityid">
+            <label>Opacity</label>
+        </div>
+        <!--
+        <br />
+        <button id="gradientgenerate" class="button" onclick="generateGradient()">Generate Gradient</button>
+        -->
+    </div>
+
+
+    <div class="params draggables" id="texturemenuid" style="display: none; direction: ltr;">
+        <h3>texture parameters</h3>
+        <!-- <div id="left" style="float: left; width: 50%;">
+            <div class="row0">
+                <div class="minus">-</div>
+                <input value="3" size="3" id="tleftred">
+                <div class="plus">+</div>
+                <label>Red Color</label>
+            </div>
+        
+            <div class="row1">
+                <div class="minus">-</div>
+                <input value="3" size="3" id="tleftgreen">
+                <div class="plus">+</div>
+                <label>Green Color</label>
+            </div>
+        
+            <div class="row0">
+                <div class="minus">-</div>
+                <input value="3" size="3" id="tleftblue">
+                <div class="plus">+</div>
+                <label>Blue Color</label>
+            </div>
+        </div>
+        
+        <div id="right" style="float: right; width: 50%;">
+            <div class="row0">
+                <div class="minus">-</div>
+                <input value="3" size="3" id="trightred">
+                <div class="plus">+</div>
+                <label>Red Color</label>
+            </div>
+        
+            <div class="row1">
+                <div class="minus">-</div>
+                <input value="3" size="3" id="trightgreen">
+                <div class="plus">+</div>
+                <label>Green Color</label>
+            </div>
+        
+            <div class="row0">
+                <div class="minus">-</div>
+                <input value="3" size="3" id="trightblue">
+                <div class="plus">+</div>
+                <label>Blue Color</label>
+            </div>
+        </div> -->
+
+        <div class="row1">
+            <select id="selectTexture" style="direction: ltr;">
+                <option>Microbial</option>
+                <option>Carbon Fibre</option>
+                <option>CheckerBoard</option>
+            </select>
+            <label>Select Texture</label>
+        </div>
+
+        <!-- <div class="row0">
+            &nbsp; #<input value="555555" size="6" id="color"> <label>Color (HEX)</label>
+        </div> -->
+
+
+        <br />
+        <button id="texturegenerate" class="button" onclick="generateTexture()">Generate Texture</button>
+    </div>
+
+    <div class="params draggables" id="imagemenuid" style="display: none; direction: ltr; width: 680px;">
+        <h3>texture parameters</h3>
+        <div class="row1" id="left" style="float: left; width: 50%;">
+            <select id="selectImage" style="direction: ltr;">
+                <option>Blue</option>
+                <option>Metal</option>
+                <option>Design</option>
+                <option>Tattoo</option>
+            </select>
+            <label>Background Image</label>
+        </div>
+
+        <div class="row1" id="right" style="float: right; width: 50%;">
+            <a href="#" class="btn btn-primary" onclick="showImage()">Preview</a>
+            <a href="#" class="btn btn-primary" onclick="selectImage()">Select</a>
+        </div>
+
+        <div class="row0" id="left" style="float: left; width: 50%;">
+            <label>Select From Folder</label>
+        </div>
+
+        <div class="row0" id="right" style="float: right; width: 50%;">
+            <input type='file' onchange="readURL(this);" />
+            <a href="#" class="btn btn-primary" onclick="defineImage()">Select</a>
+        </div>
+
+        <div class="row1" id="left" style="float: left; width: 50%;">
+            <label>No Image Option</label>
+        </div>
+
+        <div class="row1" id="right" style="float: right; width: 50%;">
+            <input type="checkbox" onchange='handleChange(this);' />
+        </div>
+
+        <br />
+        <br />
+        <br />
+        <br /><br />
+        <br />
+        <div class="row1" style="background-color: white;">
+            <img id="blah" src="#" alt="your image" />
+        </div>
+
+        <br />
+
+    </div>
+
+    <div class="params draggables" id="knobmenuid"
+        style="display: none; direction: ltr; width: 680px; overflow: scroll;">
+        <h3>Knob Selection</h3>
+        <pedal-elem-previews url="https://mainline.i3s.unice.fr/previews/knobs" pedal-element-type="knob">
+        </pedal-elem-previews>
+    </div>
+
+    <div class="params draggables" id="divmenuid"
+        style="display: none; direction: ltr; width: 680px; overflow: scroll;">
+        <h3>Geomtry Creation</h3>
+
+        <div class="row0" id="left" style="float: left;width: 50%;">
+            <label>Class Name:</label>
+        </div>
+        <div class="row0" id="right" style="float: right; width: 50%;">
+            <input type="text" id="classnameid" />
+        </div>
+        <br />
+        <br />
+        <div class="row1" id="left" style="float: left; width: 50%;">
+            <label>Id Value:</label>
+        </div>
+        <div class="row1" id="right" style="float: right; width: 50%;">
+            <input type="text" id="idvalueid" />
+        </div>
+        <br />
+        <br />
+        <div class="row0" id="left" style="float: left; width: 50%;">
+            <label>Width :</label>
+        </div>
+        <div class="row0" id="right" style="float: right; width: 50%;">
+            <input type="text" id="widthid" />
+        </div>
+        <br />
+        <br />
+        <div class="row1" id="left" style="float: left; width: 50%;">
+            <label>Height :</label>
+        </div>
+        <div class="row1" id="right" style="float: right; width: 50%;">
+            <input type="text" id="heightid" />
+        </div>
+        <br />
+        <br />
+        <div class="row0" id="left" style="float: left; width: 50%;">
+            <label>Top :</label>
+        </div>
+        <div class="row0" id="right" style="float: right; width: 50%;">
+            <input type="text" id="topid" />
+        </div>
+        <br />
+        <br />
+        <div class="row1" id="left" style="float: left; width: 50%;">
+            <label>Left :</label>
+        </div>
+        <div class="row1" id="right" style="float: right; width: 50%;">
+            <input type="text" id="leftid" />
+        </div>
+        <br />
+        <br />
+        <div class="row0" id="left" style="float: left; width: 50%;">
+            <label>Border Style:</label>
+        </div>
+        <div class="row0" id="right" style="float: right; width: 50%;">
+            <input type="text" id="borderstyleid" />
+        </div>
+        <br />
+        <br />
+        
+    </div>
+    <hr style="clear: both; display:block; visibility: hidden; height: 30px" />
+</body>
+<script>
+
+
+    //IMPORTANT: request knobs png(s)
+    fetch(document.querySelector("#knobmenuid > pedal-elem-previews").getAttribute('url'))
+        .then(response => {            
+            return response.json();
+        })
+        .then(data => {
+            document.querySelector("#knobmenuid > pedal-elem-previews").previews = data;
+            //document.querySelector("#knobmenuid > pedal-elem-previews").setUpPreviews();
+        })
+        .catch(err => {
+            console.error('Error fetching preview image names: ' + err);
+        });
+
+        /*
+    function setUpPreviews() {
+        for (let previewFile of document.querySelector("#knobmenuid > pedal-elem-previews").previews.files) {
+            console.log("DEBUG:", previewFile)
+            let previewElem = document.createElement('img');
+            previewElem.className = 'menu-img';
+            previewElem.id = 'preview';
+            previewElem.src = document.querySelector("#knobmenuid > pedal-elem-previews").previews.filesUrl +
+                previewFile
+            previewElem.alt = previewFile;
+
+            previewElem.onclick = (e) => {
+                let detail = {
+                    type: document.querySelector("#knobmenuid > pedal-elem-previews").getAttribute(
+                        'pedal-element-type'),
+                    fileName: e.target.alt
+                };
+
+                let event = new CustomEvent('preview-selected', {
+                    detail: detail
+                });
+                document.querySelector("#knobmenuid > pedal-elem-previews").dispatchEvent(event);
+            }
+
+            document.querySelector("#knobmenuid > pedal-elem-previews").shadowRoot.appendChild(previewElem);
+        }
+    }*/
+
+    /* var divs = [];
+    divs = document.querySelector("#knobmenuid > pedal-elem-previews").shadowRoot.querySelectorAll("#preview");
+        divs.forEach(e => {
+            e.onclick = function(){
+                var knobContainer = document.createElement("div");
+                knobContainer.setAttribute('class', 'knob');
+                knobContainer.setAttribute('id', 'knob');
+
+                var knobElem = document.createElement("webaudio-knob");
+
+                
+                knobElem.setAttribute('sprites', 100);
+                knobElem.setAttribute('value', 0);
+                knobElem.setAttribute('step', 1);
+                knobElem.setAttribute('height', '70px;');
+                knobElem.setAttribute('width', '70px;');
+                knobElem.setAttribute('src', '.'.concat(document.querySelector("#knobmenuid > pedal-elem-previews").shadowRoot.querySelector("#preview").getAttribute('src').substr(21)));
+
+                knobContainer.appendChild(knobElem);
+
+                this.pedal.shadowRoot.querySelector('.pedal').appendChild(knobContainer);
+            }
+        }); */
+
+
+    /* $('div.swatch').click(function(){
+        $('#box').attr('style', $(this).attr('style'));
+        $('#snippet').html($(this).attr('style'));
+    }) */
+
+
+    var swatchclick = 0;
+    document.getElementById('hardlight').onclick = function () {
+        swatchclick++;
+        var pp = document.querySelector('.my-pedal');
+        if (pp) {
+            if ((swatchclick % 2) == 0) {
+                pp.style.boxShadow = 'none';
+                pp.style.boxShadow = document.getElementById('hardlight')
+                    .style.boxShadow;
+            } else {
+                pp.style.boxShadow = 'none';
+            }
+        }
+    };
+    swatchclick = 0;
+    document.getElementById('soft').onclick = function () {
+        swatchclick++;
+        var pp = document.querySelector('.my-pedal');
+        if (pp) {
+            if ((swatchclick % 2) == 0) {
+                pp.style.boxShadow = 'none';
+                pp.style.boxShadow = document.getElementById('soft').style
+                    .boxShadow;
+            } else {
+                pp.style.boxShadow = 'none';
+            }
+        }
+    };
+    swatchclick = 0;
+    document.getElementById('fromabove').onclick = function () {
+        swatchclick++;
+        var pp = document.querySelector('.my-pedal');
+        if (pp) {
+            if ((swatchclick % 2) == 0) {
+                pp.style.boxShadow = 'none';
+                pp.style.boxShadow = document.getElementById('fromabove')
+                    .style.boxShadow;
+            } else {
+                pp.style.boxShadow = 'none';
+            }
+        }
+    };
+    swatchclick = 0;
+    document.getElementById('reduced').onclick = function () {
+        swatchclick++;
+        var pp = document.querySelector('.my-pedal');
+        if (pp) {
+            if ((swatchclick % 2) == 0) {
+                pp.style.boxShadow = 'none';
+                pp.style.boxShadow = document.getElementById('reduced').style
+                    .boxShadow;
+            } else {
+                pp.style.boxShadow = 'none';
+            }
+        }
+    };
+    swatchclick = 0;
+    document.getElementById('inset').onclick = function () {
+        swatchclick++;
+        var pp = document.querySelector('.my-pedal');
+        if (pp) {
+            if ((swatchclick % 2) == 0) {
+                pp.style.boxShadow = 'none';
+                pp.style.boxShadow = document.getElementById('inset').style
+                    .boxShadow;
+            } else {
+                pp.style.boxShadow = 'none';
+            }
+        }
+    };
+    swatchclick = 0;
+    document.getElementById('glow').onclick = function () {
+        swatchclick++;
+        var pp = document.querySelector('.my-pedal');
+        if (pp) {
+            if ((swatchclick % 2) == 0) {
+                pp.style.boxShadow = 'none';
+                pp.style.boxShadow = document.getElementById('glow').style
+                    .boxShadow;
+            } else {
+                pp.style.boxShadow = 'none';
+            }
+        }
+    };
+    swatchclick = 0;
+    document.getElementById('disto').onclick = function () {
+        swatchclick++;
+        var pp = document.querySelector('.my-pedal');
+        if (pp) {
+            var style = pp.style;
+            if ((swatchclick % 2) == 0) {
+                style.boxShadow = 'none';
+                style.background = document.getElementById('color').value;
+                style.boxShadow = document.getElementById('disto').style.boxShadow;
+                style.background = document.getElementById('disto').style.background;
+            } else {
+                style.boxShadow = 'none';
+                style.background = document.getElementById('color').value;
+
+            }
+        }
+    };
+    swatchclick = 0;
+
+
+
+    function setShadow() {
+        var b = document.querySelector('my-pedal');
+        var shdw = '';
+        var offsetx = document.getElementById('offX').value;
+        var offsety = document.getElementById('offY').value;
+        var blur = document.getElementById('blur').value;
+        var spread = document.getElementById('spread').value;
+
+        if (b.shadowRoot) {
+            shdw += offsetx + 'px' + ' ' + offsety + 'px' + ' ' + blur + 'px' + ' ' + spread + 'px';
+            if (document.getElementById('insett').checked) {
+                shdw += ' inset';
+                pedal.shadowRoot.getElementById('pedal').style.boxShadow = shdw;
+            }
+            pedal.shadowRoot.getElementById('pedal').style.boxShadow = shdw;
+
+        }
+
+    }
+
+
+    //setShadow();
+
+
+
+
+
+    function toggleShadowMenuFunction() {
+        var x = document.getElementById("shadowmenuid");
+        if (x.style.display === "none") {
+            x.style.display = "block";
+        } else {
+            x.style.display = "none";
+        }
+    }
+
+
+    function toggleGradientMenuFunction() {
+        var x = document.getElementById("gradientmenuid");
+        if (x.style.display === "none") {
+            x.style.display = "block";
+            generateGradient();
+        } else {
+            x.style.display = "none";
+        }
+    }
+
+
+    function generateGradient(event) {
+        // avoid moving floating menu.
+        //event.preventDefault();
+        //event.stopPropagation();
+
+        let pp = document.querySelector('.gradiant-target');
+        
+        if(pp == undefined) return;
+
+        let startColor = tinycolor(document.querySelector('#startColor').value).toRgb();
+        let endColor = tinycolor(document.querySelector('#endColor').value).toRgb();
+
+        let opacity = Number(document.querySelector('#opacityid').value);
+        let backgroundImage = pp.style.backgroundImage;
+        backgroundImage = backgroundImage.slice(backgroundImage.indexOf('\"') + 1, backgroundImage.lastIndexOf('\"'));
+        
+
+        let gradiant = 'linear-gradient(rgba(' + startColor.r + ', ' +
+            startColor.g + ', ' + startColor.b + ', ' + opacity + '), ' + 'rgba(' + endColor.r + ', ' + endColor.g +
+            ', ' +
+            endColor.b + ', ' + opacity + ')), url(\"' + backgroundImage + '\")';
+
+        pp.style.background = gradiant;
+        pp.style.backgroundPosition = 'center';
+        pp.style.backgroundSize = '100%';
+        /*
+        if (pp) {
+            pedal.shadowRoot.getElementById('pedal').style.background = 'linear-gradient(rgb(' + leftred + ', ' +
+                leftgreen + ', ' + leftblue + '), ' + 'rgb(' + rightred + ', ' + rightgreen + ', ' + rightblue + '))';
+            pedal.shadowRoot.getElementById('textB').style.background = 'linear-gradient(rgba(' + leftred + ', ' +
+                leftgreen + ', ' + leftblue + ', ' + opacity + '), ' + 'rgba(' + rightred + ', ' + rightgreen + ', ' +
+                rightblue + ', ' + opacity + '))';
+        }
+        */
+    }
+
+    function generateTexture() {
+        var pp = document.querySelector('my-pedal');
+        var selector = document.getElementById('selectTexture');
+        if (pp.shadowRoot) {
+            if (selector.options[0].selected) {
+                pedal.shadowRoot.getElementById('pedal').style.background = "";
+                //pedal.shadowRoot.getElementById('textB').style.background = "";
+                pedal.shadowRoot.querySelector('.pedal').style.cssText =
+                    'background: radial-gradient(circle at 0% 50%, rgba(96, 16, 48, 0) 9px, #613 10px, rgba(96, 16, 48, 0) 11px) 0px 10px, radial-gradient(at 100% 100%,      rgba(96, 16, 48, 0) 9px, #613 10px, rgba(96, 16, 48, 0) 11px), #8a3; background-size: 20px 20px;';
+                //pedal.shadowRoot.querySelector('.text-block').style.cssText = 'background: radial-gradient(circle at 0% 50%, rgba(96, 16, 48, 0) 9px, #613 10px, rgba(96, 16, 48, 0) 11px) 0px 10px, radial-gradient(at 100% 100%,      rgba(96, 16, 48, 0) 9px, #613 10px, rgba(96, 16, 48, 0) 11px), #8a3; background-size: 20px 20px;';
+                //pedal.shadowRoot.getElementById('textB').style.background = "radial-gradient(black 15%, transparent 16%) 0 0, radial-gradient(black 15%, transparent 16%) 8px 8px, radial-gradient(rgba(255,255,255,0) 15%, transparent 20%) 0 1px, radial-gradient(rgba(255,255,255,0) 15%, transparent 20%) 8px 9px;";
+            }
+            if (selector.options[1].selected) {
+                pedal.shadowRoot.getElementById('pedal').style.background = "";
+                //pedal.shadowRoot.getElementById('textB').style.background = "";
+                pedal.shadowRoot.querySelector('.pedal').style.cssText =
+                    'background: radial-gradient(black 15%, transparent 16%) 0 0, radial-gradient(black 15%, transparent 16%) 8px 8px, radial-gradient(rgba(255,255,255,.1) 15%, transparent 20%) 0 1px, radial-gradient(rgba(255,255,255,.1) 15%, transparent 20%) 8px 9px; background-color:#282828; background-size:16px 16px;';
+                //pedal.shadowRoot.querySelector('.text-block').style.cssText = 'background: radial-gradient(black 15%, transparent 16%) 0 0, radial-gradient(black 15%, transparent 16%) 8px 8px, radial-gradient(rgba(255,255,255,.1) 15%, transparent 20%) 0 1px, radial-gradient(rgba(255,255,255,.1) 15%, transparent 20%) 8px 9px; background-color:#282828; background-size:16px 16px;';
+            }
+            if (selector.options[2].selected) {
+                pedal.shadowRoot.getElementById('pedal').style.background = "";
+                //pedal.shadowRoot.getElementById('textB').style.background = "";
+                pedal.shadowRoot.querySelector('.pedal').style.cssText =
+                    'background-color: #eee; background-image: linear-gradient(45deg, black 25%, transparent 25%, transparent 75%, black 75%, black), linear-gradient(45deg, black 25%, transparent 25%, transparent 75%, black 75%, black); background-size: 60px 60px; background-position: 0 0, 30px 30px;';
+                //pedal.shadowRoot.querySelector('.text-block').style.cssText = 'background-color: #eee; background-image: linear-gradient(45deg, black 25%, transparent 25%, transparent 75%, black 75%, black), linear-gradient(45deg, black 25%, transparent 25%, transparent 75%, black 75%, black); background-size: 60px 60px; background-position: 0 0, 30px 30px;';
+            }
+        }
+    }
+
+    function togglePreSetsFunction() {
+        var x = document.getElementById("presetsid");
+        if (x.style.display === "none") {
+            x.style.display = "block";
+        } else {
+            x.style.display = "none";
+        }
+    }
+
+
+
+    function toggleLabelMenu() {
+        var linkId = document.getElementById('LabelMenu');
+        var click = 0;
+        var pp = document.querySelector('my-pedal');
+
+        linkId.onclick = function () {
+            click++;
+            if (pp.shadowRoot) {
+                window.addEventListener("contextmenu", e => {
+                    if ((click % 2) == 0) {
+                        this.removeEventListener("contextmenu", e, false);
+                        //console.log("number of clicks is:" + click);
+                    } else {
+                        e.preventDefault();
+                        const origin = {
+                            left: e.pageX + 10,
+                            top: e.pageY + 10
+                        };
+                        setPosition(origin);
+                        //console.log("number of clicks is :" + click);
+                        return false;
+                    }
+                });
+            }
+        };
+    }
+
+
+
+    function drawRectangle() {
+        var pp = document.querySelector('my-pedal');
+        if (pp.shadowRoot) {
+            initDraw(pedal.shadowRoot.getElementById('pedal'));
+        }
+
+    }
+
+    function initDraw(canvas) {
+        function setMousePosition(e) {
+            var ev = e || window.event; //Moz || IE
+            if (ev.pageX) { //Moz
+                mouse.x = ev.pageX + window.pageXOffset;
+                mouse.y = ev.pageY + window.pageYOffset;
+            } else if (ev.clientX) { //IE
+                mouse.x = ev.clientX + document.body.scrollLeft;
+                mouse.y = ev.clientY + document.body.scrollTop;
+            }
+        };
+
+        var mouse = {
+            x: 0,
+            y: 0,
+            startX: 0,
+            startY: 0
+        };
+        var element = null;
+
+        canvas.onmousemove = function (e) {
+            setMousePosition(e);
+            if (element !== null) {
+                element.style.width = Math.abs(mouse.x - mouse.startX) + 'px';
+                element.style.height = Math.abs(mouse.y - mouse.startY) + 'px';
+                element.style.left = (mouse.x - mouse.startX < 0) ? mouse.x + 'px' : mouse.startX + 'px';
+                element.style.top = (mouse.y - mouse.startY < 0) ? mouse.y + 'px' : mouse.startY + 'px';
+            }
+        }
+
+        canvas.onclick = function (e) {
+            if (element !== null) {
+                element = null;
+                canvas.style.cursor = "default";
+                //console.log("finsihed.");
+            } else {
+                //console.log("begun.");
+                mouse.startX = mouse.x;
+                mouse.startY = mouse.y;
+                element = document.createElement('div');
+                element.className = 'rectangle'
+                element.style.left = mouse.x + 'px';
+                element.style.top = mouse.y + 'px';
+                canvas.appendChild(element)
+                canvas.style.cursor = "crosshair";
+            }
+        }
+    }
+
+
+
+
+    window.onmousemove = moveElem;
+    window.onmouseup = stopMovingElem;
+
+
+    var selected = null; // element to be moved
+    var oldMouseX, oldMouseY; // Stores x & y coordinates of the mouse pointer
+    var elemX, elemY;
+    var divs = [];
+
+
+    // Will be called when user starts dragging an element
+    function dragInit(evt) {
+        // Store the elem
+        selected = evt.target;
+        elemX = selected.offsetLeft;
+        elemY = selected.offsetTop;
+
+        oldMouseX = evt.clientX;
+        oldMouseY = evt.clientY;
+        //evt.stopPropagation();
+    }
+
+    // Will be called when user dragging an element
+    function moveElem(e) {
+        // new mouse ps
+        var newMouseX = e.clientX;
+        var newMouseY = e.clientY;
+
+        if (oldMouseX !== undefined) {
+            // how many pixels did we move the mouse?
+            var dx = newMouseX - oldMouseX;
+            var dy = newMouseY - oldMouseY;
+        }
+
+        if (selected !== null) {
+            // move the selected element dx, dy pixels hozontally/vertically
+            changePosOfSelectedElement(dx, dy);
+        }
+
+        // update the old position of the mouse
+        oldMouseX = newMouseX;
+        oldMouseY = newMouseY;
+    }
+
+    function changePosOfSelectedElement(dx, dy) {
+        // update the old position of the selected element
+        elemX += dx;
+        elemY += dy;
+
+        // change the pos on screen of the element
+        // by modifying its CSS left/top properties
+        selected.style.left = elemX + 'px';
+        selected.style.top = elemY + 'px';
+    }
+
+    // Destroy the object when we are done
+    function stopMovingElem() {
+        selected = null;
+    }
+
+    function submitChangeName() {
+        pedal.name = document.getElementById('nompedal').value;
+    }
+
+    function submitChangeLabel() {
+        var pp = document.querySelector('my-pedal');
+
+        if (pp.shadowRoot) {
+            pedal.shadowRoot.getElementById('test').innerHTML = document.getElementById('labelpedal').value;
+        }
+    }
+
+    const menu = document.querySelector(".menu");
+    let menuVisible = false;
+
+    const toggleMenu = command => {
+        menu.style.display = command === "show" ? "block" : "none";
+        menuVisible = !menuVisible;
+    };
+
+    const setPosition = ({
+        top,
+        left
+    }) => {
+        menu.style.left = `${left}px`;
+        menu.style.top = `${top}px`;
+        toggleMenu("show");
+    };
+
+    /* if (document.querySelector('my-pedal').shadowRoot) {
+        window.addEventListener("click", e => {
+            if (menuVisible) toggleMenu("hide");
+        });
+
+        window.addEventListener("contextmenu", e => {
+            e.preventDefault();
+            const origin = {
+                left: e.pageX,
+                top: e.pageY
+            };
+            setPosition(origin);
+            return false;
+        });
+    } */
+
+    var fonts = ["Montez", "Lobster", "Roboto", "Lexend Zetta", "Josefin Sans", "Shadows Into Light", "Pacifico",
+        "Amatic SC", "Orbitron", "Rokkitt", "Righteous", "Dancing Script", "Bangers", "Chewy", "Sigmar One",
+        "Architects Daughter", "Abril Fatface", "Covered By Your Grace", "Kaushan Script", "Gloria Hallelujah",
+        "Satisfy", "Lobster Two", "Comfortaa", "Cinzel", "Courgette"
+    ];
+    var string = "";
+    var select = document.getElementById("select")
+    for (var a = 0; a < fonts.length; a++) {
+        var opt = document.createElement('option');
+        opt.value = opt.innerHTML = fonts[a];
+        opt.style.fontFamily = fonts[a];
+        select.add(opt);
+    }
+
+    function fontChange() {
+        var x = document.getElementById("select").selectedIndex;
+        var y = document.getElementById("select").options;
+        document.body.insertAdjacentHTML("beforeend", "<style> #text{ font-family:'" + y[x].text + "';}" +
+            "#select{font-family:'" + y[x].text + "';</style>");
+
+        var t3 = new TimelineLite,
+            mySplitText3 = new SplitText("#h3", {
+                type: "words,chars"
+            }),
+            chars = mySplitText3.chars; //an array of all the divs that wrap each character
+        TweenLite.set("#h3", {
+            perspective: 400
+        });
+        t3.staggerFrom(chars, 0.2, {
+            opacity: 0,
+            scale: 0,
+            y: 80,
+            rotationX: 180,
+            transformOrigin: "0% 150% -50",
+            ease: Back.easeOut
+        }, 0.01, "+=0");
+        var pp = document.querySelector('my-pedal');
+        if (pp.shadowRoot) {
+            pedal.shadowRoot.getElementById('test').style.fontFamily = window.getComputedStyle(document.getElementById(
+                'h3')).getPropertyValue('font-family');
+        }
+    }
+    /* TweenLite.to(page, 0, {top:"-100vh", ease:Bounce.easeOut, delay:0});
+    TweenLite.to(page, 1, {top:"0vh", ease:Elastic.easeOut, delay:1}); */
+    //fontChange();
+
+    function labelPedalChange() {
+
+        var pp = document.querySelector('my-pedal');
+        if (pp.shadowRoot) {
+            pedal.shadowRoot.getElementById('test').style.fontFamily = window.getComputedStyle(document.getElementById(
+                'h3')).getPropertyValue('font-family');
+        }
+    }
+
+    var totalClicksX = 0;
+
+    function moveLabelXLeft() {
+        var pp = document.querySelector('my-pedal');
+        //var t='10';
+        //var click=0;
+        //var link = document.getElementById('moveLabelXLeft');
+        totalClicksX += 10;
+        if (pp.shadowRoot) {
+            pedal.shadowRoot.getElementById('test').style.right = String(totalClicksX).concat("px");
+        }
+    }
+
+
+    function moveLabelXRight() {
+        var pp = document.querySelector('my-pedal');
+        //var t='10';
+        //var click=0;
+        //var link = document.getElementById('moveLabelXRight');
+        totalClicksX -= 10;
+        if (pp.shadowRoot) {
+            pedal.shadowRoot.getElementById('test').style.right = String(totalClicksX).concat("px");
+        }
+    }
+
+    var totalClicksY = 0;
+
+    function moveLabelYUp() {
+        var pp = document.querySelector('my-pedal');
+        //var t='10';
+        //var click=0;
+        //var link = document.getElementById('moveLabelXRight');
+        totalClicksY += 10;
+        if (pp.shadowRoot) {
+            pedal.shadowRoot.getElementById('test').style.bottom = String(totalClicksY).concat("px");
+        }
+    }
+
+    function moveLabelYDown() {
+        var pp = document.querySelector('my-pedal');
+        //var t='10';
+        //var click=0;
+        //var link = document.getElementById('moveLabelXRight');
+        totalClicksY -= 10;
+        if (pp.shadowRoot) {
+            pedal.shadowRoot.getElementById('test').style.bottom = String(totalClicksY).concat("px");
+        }
+    }
+
+
+    function changeSize(n) {
+        var s = document.getElementById('h3');
+        var pp = document.querySelector('my-pedal');
+        s.style.fontSize = n.value + 'px'
+
+        if (pp.shadowRoot) {
+            pedal.shadowRoot.getElementById('test').style.fontSize = window.getComputedStyle(document.getElementById(
+                'h3')).getPropertyValue('font-size');
+        }
+    }
+
+
+    function fontSizeX() {
+        var s = document.getElementById('h3');
+        var pp = document.querySelector('my-pedal');
+        //var click = Number(window.getComputedStyle(document.getElementById('h3')).getPropertyValue('font-size').slice(0,2));
+
+        //var click = Number(document.getElementById('sel1').value);
+        var sel = document.getElementById('sel1');
+
+        var link = document.getElementById('fontSizeX');
+        link.onclick = function () {
+
+            if (pp.shadowRoot) {
+                var toto = Number(window.getComputedStyle(pedal.shadowRoot.getElementById('test')).getPropertyValue(
+                    'font-size').slice(0, 2));
+            }
+            click = toto + 1;
+
+            if (pp.shadowRoot) {
+                pedal.shadowRoot.getElementById('test').style.fontSize = String(click).concat("px");
+            }
+            //s.style.fontSize = click + 'px';
+            //document.getElementById('sel1').value = click;
+        };
+
+    }
+
+
+    function fontSizeY() {
+        var s = document.getElementById('h3');
+        var pp = document.querySelector('my-pedal');
+        //var click = Number(window.getComputedStyle(document.getElementById('h3')).getPropertyValue('font-size').slice(0,2));
+
+        //var click = Number(document.getElementById('sel1').value);
+        var sel = document.getElementById('sel1');
+
+        var link = document.getElementById('fontSizeY');
+        link.onclick = function () {
+
+            if (pp.shadowRoot) {
+                var toto = Number(window.getComputedStyle(pedal.shadowRoot.getElementById('test')).getPropertyValue(
+                    'font-size').slice(0, 2));
+            }
+            if (toto > 0) {
+                click = toto - 1;
+            }
+
+
+            if (pp.shadowRoot) {
+                pedal.shadowRoot.getElementById('test').style.fontSize = String(click).concat("px");
+            }
+            //s.style.fontSize = click + 'px';
+            //document.getElementById('sel1').value = click;
+        };
+
+    }
+
+
+    function changeLabelFont(n) {
+        var s = document.getElementById('h3');
+        var pp = document.querySelector('my-pedal');
+        s.style.fontFamily = n.value;
+
+        if (pp.shadowRoot) {
+            pedal.shadowRoot.getElementById('test').style.fontFamily = window.getComputedStyle(document.getElementById(
+                'h3')).getPropertyValue('font-family');
+        }
+    }
+
+
+    function HEX2RGB(hex) {
+        "use strict";
+        if (hex.charAt(0) === '#') {
+            hex = hex.substr(1);
+        }
+        if ((hex.length < 2) || (hex.length > 6)) {
+            return false;
+        }
+        var values = hex.split(''),
+            r,
+            g,
+            b;
+
+        if (hex.length === 2) {
+            r = parseInt(values[0].toString() + values[1].toString(), 16);
+            g = r;
+            b = r;
+        } else if (hex.length === 3) {
+            r = parseInt(values[0].toString() + values[0].toString(), 16);
+            g = parseInt(values[1].toString() + values[1].toString(), 16);
+            b = parseInt(values[2].toString() + values[2].toString(), 16);
+        } else if (hex.length === 6) {
+            r = parseInt(values[0].toString() + values[1].toString(), 16);
+            g = parseInt(values[2].toString() + values[3].toString(), 16);
+            b = parseInt(values[4].toString() + values[5].toString(), 16);
+        } else {
+            return false;
+        }
+        return [r, g, b];
+    }
+
+
+    function changeShadowColor() {
+        var pp = document.querySelector('my-pedal');
+        var col = document.getElementById('jscolorshadowpick').value;
+        var ca = "#";
+
+        var color = ca.concat(col);
+        var finalcolor = HEX2RGB(color);
+
+        var r = finalcolor[0];
+        var g = finalcolor[1];
+        var b = finalcolor[2];
+
+        if (pp.shadowRoot) {
+            //pedal.shadowRoot.getElementById('pedal').style.boxShadow = 'none';
+            pedal.shadowRoot.getElementById('pedal').style.boxShadow += ' rgb(' + r + ', ' + g + ', ' + b + ') ';
+        }
+    }
+
+    function changeColor(n) {
+        var s = document.getElementById('h3');
+        var pp = document.querySelector('my-pedal');
+        var ca = "#";
+
+        s.style.color = ca.concat(n.value);
+
+        if (pp.shadowRoot) {
+            pedal.shadowRoot.getElementById('test').style.color = window.getComputedStyle(document.getElementById('h3'))
+                .getPropertyValue('color');
+        }
+    }
+
+
+    function pedalitemslist() {
+        var length = pedal.shadowRoot.getElementById('pedal').children.length;
+        //var i=2;
+        var sel = document.getElementById('selectliste');
+
+
+
+        for (var i = 2; i <= length - 1; i++) {
+            var opt = document.createElement('option');
+            opt.text = pedal.shadowRoot.getElementById('pedal').children[i].id;
+            sel.appendChild(opt);
+        }
+
+    }
+
+
+    $('a[href$="#myModal"]').on("click", function () {
+        $('#myModal').modal('show');
+    });
+
+
+    $('a[href$="#myModal2"]').on("click", function () {
+        $('#myModal2').modal('show');
+    });
+
+    $('a[href$="#myModal3"]').on("click", function () {
+        $('#myModal3').modal('show');
+    });
+
+    $('a[href$="#myModal4"]').on("click", function () {
+        $('#myModal4').modal('show');
+    });
+
+    $('a[href$="#myModal5"]').on("click", function () {
+        $('#myModal5').modal('show');
+    });
+
+
+
+    /* $(".dropdown-toggle").on("mouseenter", function () {
+        // make sure it is not shown:
+        if (!$(this).parent().hasClass("show")) {
+            $(this).click();
+        }
+    });
+
+
+    $(".btn-group, .dropdown").on("mouseleave", function () {
+        // make sure it is shown:
+        if ($(this).hasClass("show")){
+            $(this).children('.dropdown-toggle').first().click();
+        }
+    }); */
+
+
+    $(function () {
+        $("#menu-toggle").click(function (e) {
+            e.preventDefault();
+            $("#wrapper").toggleClass("toggled");
+        });
+
+        $(window).resize(function (e) {
+            if ($(window).width() <= 768) {
+                $("#wrapper").removeClass("toggled");
+            } else {
+                $("#wrapper").addClass("toggled");
+            }
+        });
+    });
+
+
+    function toggleFullScreen() {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen();
+        } else {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            }
+        }
+    }
+
+
+    function closeMenu() {
+        var mn = document.getElementById("closeLink");
+        mn.onclick = function () {
+            toggleMenu("hide");
+        };
+    }
+
+    function RGBAToHexA(r, g, b, a) {
+        r = r.toString(16);
+        g = g.toString(16);
+        b = b.toString(16);
+        a = Math.round(a * 255).toString(16);
+
+        if (r.length == 1)
+            r = "0" + r;
+        if (g.length == 1)
+            g = "0" + g;
+        if (b.length == 1)
+            b = "0" + b;
+        if (a.length == 1)
+            a = "0" + a;
+
+        return "#" + r + g + b + a;
+    }
+
+    var nbliensclick = 0;
+
+    function BoldStyle() {
+        var click = 0;
+        var link = document.getElementById('boldid');
+        var pp = document.querySelector('my-pedal');
+        document.getElementById("h3").style.fontWeight = "900";
+        link.onclick = function () {
+            click++;
+            nbliensclick++;
+            if ((click % 2) == 0) {
+                document.getElementById("h3").style.fontWeight = "";
+            } else {
+                document.getElementById("h3").style.fontWeight = "900";
+            }
+
+            if (pp.shadowRoot) {
+                pedal.shadowRoot.getElementById('test').style.fontWeight = window.getComputedStyle(document
+                    .getElementById('h3')).getPropertyValue('font-weight');
+            }
+        };
+    }
+
+    function UnderlineStyle() {
+        var click = 0;
+        var link = document.getElementById('underlineid');
+        var pp = document.querySelector('my-pedal');
+        document.getElementById("h3").style.textDecoration = "underline";
+        link.onclick = function () {
+            click++;
+            nbliensclick++;
+            if ((click % 2) == 0) {
+                document.getElementById("h3").style.textDecoration = "";
+            } else {
+                document.getElementById("h3").style.textDecoration = "underline";
+            }
+            if (pp.shadowRoot) {
+                pedal.shadowRoot.getElementById('test').style.textDecoration = window.getComputedStyle(document
+                    .getElementById('h3')).getPropertyValue('text-decoration');
+            }
+        };
+    }
+
+    function OverlineStyle() {
+        var click = 0;
+        var link = document.getElementById('overlineid');
+        var pp = document.querySelector('my-pedal');
+        document.getElementById("h3").style.textDecoration = "overline";
+        link.onclick = function () {
+            click++;
+            nbliensclick++;
+            if ((click % 2) == 0) {
+                document.getElementById("h3").style.textDecoration = "";
+            } else {
+                document.getElementById("h3").style.textDecoration = "overline";
+            }
+            if (pp.shadowRoot) {
+                pedal.shadowRoot.getElementById('test').style.textDecoration = window.getComputedStyle(document
+                    .getElementById('h3')).getPropertyValue('text-decoration');
+            }
+        };
+    }
+
+
+    function GripLinesStyle() {
+        var click = 0;
+        var link = document.getElementById('griplinesid');
+        var pp = document.querySelector('my-pedal');
+        document.getElementById("h3").style.textDecoration = "underline overline";
+        link.onclick = function () {
+            click++;
+            nbliensclick++;
+            if ((click % 2) == 0) {
+                document.getElementById("h3").style.textDecoration = "";
+            } else {
+                document.getElementById("h3").style.textDecoration = "underline overline";
+            }
+            if (pp.shadowRoot) {
+                pedal.shadowRoot.getElementById('test').style.textDecoration = window.getComputedStyle(document
+                    .getElementById('h3')).getPropertyValue('text-decoration');
+            }
+        };
+    }
+
+
+
+    function LoadTemplateConfig() {
+        var frame = document.getElementById('template1');
+        var linkframe = document.getElementById('selectTemplate');
+
+
+
+    }
+
+
+    function LabelColorStyle() {
+
+    }
+
+
+    function refreshModal() {
+
+        document.getElementById('width').value = '';
+        document.getElementById('color').value = '';
+        document.getElementById('height').value = '';
+        document.getElementById('radius').value = '';
+        document.getElementById('name').value = '';
+    }
+
+    //var url = "http://localhost:8085";
+    const serverUrl = "https://mainline.i3s.unice.fr"; // 'http://localhost:3000';
+    let generationType = "";
+
+    var http = new XMLHttpRequest();
+    var path = "/pedale";
+    //var ctx = new AudioContext();
+    var section = document.getElementsByClassName("pedalSection")[0];
+    //var section2 = document.getElementById('editor-pedal-details');
+    var pedal = getFirstChild(section);
+    var editorPedalDetails = document.getElementById('editor-pedal-details');
+    var knobSprite;
+    var switchSprite;
+    let savedPedalsConfigs;
+    let functionalPedalGenerator;
+
+    var bt_buildIt = document.querySelector('#bt_buildIt');
+    let currentWapName, currentWapCode;
+
+
+    //window.onload = initialize;
+    //Mettre en commentaire la fonction ci-dessous avant d'utiliser faust, bug à régler
+    /* function init(){
+        var pp = document.querySelector('my-pedal');
+        if(pp.shadowRoot){
+            divs = pedal.shadowRoot.querySelectorAll('.draggable');
+            divs.forEach(e => {
+            e.onmousedown = function (evt) {
+                dragInit(evt);
+                //console.log('true');
+                e.stopPropagation();
+            };
+                      })
+        }
+    } */
+    var faustUI = {};
+
+    function initialize() {
+        var urlParams = new URLSearchParams(window.location.search);
+
+        //console.log(urlParams.has('data')); // true
+        //console.log(urlParams.get('data'));
+        //console.log("name present : " + urlParams.has('name')); // true
+        //console.log("name = " + urlParams.get('name'));
+        //console.log("### FAUSTUI JSON = ");
+        //console.log(urlParams.get('data'));
+        console.log("###");
+        //faustUI = JSON.parse(urlParams.get('data'));
+    }
+
+    function setFaustUIFromUrl() {
+        let url = new URL(location);
+        let searchParams = new URLSearchParams(url.search);
+        //console.log("url = ", url)
+        faustUI = searchParams.get('data');
+        //console.log("data = ", faustUI)
+    }
+
+
+    /*Slider Nav Menu*/
+    function openNav() {
+        document.getElementById("mySidenav").style.width = "500px";
+    }
+
+    function closeNav() {
+        document.getElementById("mySidenav").style.width = "0";
+    }
+
+    function newPedal(args, withoutInit) {
+        buildPedal();
+
+        function buildPedal() {
+            console.log("Building pedal...")
+
+            section.innerHTML = '';
+            pedal = null;
+            let pedalElem = document.createElement('my-pedal');
+            pedalElem.id = "my-pedal";
+            //pedalElem.className = "draggable";
+            section.appendChild(pedalElem);
+            pedal = pedalElem;
+            pedal.toto();
+
+            pedal.addEventListener('select-knob', function (e) {
+                console.log("selectKnob(e.detail);")
+                selectKnob(e.detail);
+                console.log("updateInspector();")
+                updateInspector();
+            });
+
+            if (!withoutInit) {
+                defaultPedalConfig.name = currentWapName;
+            }
+
+            var r = Number(document.getElementById("color").value.slice(5, 8));
+            var g = Number(document.getElementById("color").value.slice(9, 12));
+            var b = Number(document.getElementById("color").value.slice(13, 16));
+            var a = Number(document.getElementById("color").value.slice(17, 20));
+            //RGBAToHexA(r,g,b,a)
+
+            let defaultPedalConfig = {
+                color: document.getElementById('color').value,
+                width: Number(document.getElementById('width').value),
+                height: Number(document.getElementById('height').value),
+                radius: Number(document.getElementById('radius').value),
+                elements: [],
+                name: document.getElementById('name').value
+            };
+
+            /*
+                    let modifiedPedalConfig = {
+                        color: RGBAToHexA(r, g, b, a),
+                        width: window.getComputedStyle(pedal.shadowRoot.getElementById('pedal')).getPropertyValue('width')
+                            .slice(0, window.getComputedStyle(pedal.shadowRoot.getElementById('pedal')).getPropertyValue(
+                                'width').lastIndexOf("p")),
+                        height: window.getComputedStyle(pedal.shadowRoot.getElementById('pedal')).getPropertyValue('height')
+                            .slice(0, window.getComputedStyle(pedal.shadowRoot.getElementById('pedal')).getPropertyValue(
+                                'width').lastIndexOf("p")),
+                        radius: window.getComputedStyle(pedal.shadowRoot.getElementById('pedal')).getPropertyValue('radius')
+                            .slice(0, window.getComputedStyle(pedal.shadowRoot.getElementById('pedal')).getPropertyValue(
+                                'width').lastIndexOf("p")),
+                        elements: [],
+                        name: document.getElementById('name').value
+                    }
+            */
+            if (args) {
+                defaultPedalConfig.name = args.name;
+                defaultPedalConfig.height = args.height;
+                defaultPedalConfig.width = args.width;
+                defaultPedalConfig.name = args.name;
+                defaultPedalConfig.elements = args.elements;
+            }
+
+            pedal.loadConfig(defaultPedalConfig);
+            //pedal.loadConfig(modifiedPedalConfig);
+            /* if(Number(defaultPedalConfig.width) < Number(window.getComputedStyle(pedal.shadowRoot.getElementById('pedal')).getPropertyValue('width').slice(0,1))  || Number(defaultPedalConfig.width) > Number(window.getComputedStyle(pedal.shadowRoot.getElementById('pedal')).getPropertyValue('width').slice(0,1))) {
+                
+                pedal.loadConfig(modifiedPedalConfig);
+            }
+            else{
+                pedal.loadConfig(defaultPedalConfig);
+            } */
+            plugPedalToEditor();
+
+            console.log("[DEBUG] - Pedal");
+            console.log(pedal);
+            functionalPedalGenerator = new FunctionalPedalGeneratorMichelWam2(pedal, getPedalConfig(pedal).elements);
+
+            document.getElementById('h3').innerHTML = document.getElementById('label').value;
+            var ped = document.querySelector('my-pedal');
+
+            if (ped.shadowRoot) {
+                pedal.shadowRoot.getElementById('test').innerHTML = document.getElementById('label').value;
+                /* window.addEventListener("click", e => {
+                    const flyoutElement = document.getElementById("closeLink");
+                    let targetElement = e.target;
+                    if (targetElement === flyoutElement) toggleMenu("hide");
+                }); */
+
+                /* window.addEventListener("contextmenu", e => {
+                    e.preventDefault();
+                    const origin = {
+                        left: e.pageX,
+                        top: e.pageY
+                    };
+                    setPosition(origin);
+                    return false;
+                }); */
+            }
+        }
+    }
+
+    function removeDOMElement() {
+        var p = document.querySelector('my-pedal');
+
+        if (p.shadowRoot) {
+            //pedal.shadowRoot.getElementById('pedal').removeChild(pedal.shadowRoot.getElementById('pedal').children[2]);
+
+            for (var i = 2; i < pedal.shadowRoot.getElementById('pedal').childElementCount; i++) {
+                pedal.shadowRoot.getElementById('pedal').removeChild(pedal.shadowRoot.getElementById('pedal').children[
+                    i]);
+            }
+        }
+
+    }
+
+
+    /* function removeDOMElement(){
+        var p = pedal.shadowRoot.getElementById('pedal');
+
+        p.addEventListener("click",function(e) {
+        var tgt = e.target;
+        if (tgt.id.includes('knob')) {
+            tgt.parentNode.removeChild(tgt); // or tgt.remove();
+        }
+        });
+    } */
+
+    // Remove the selected CSS class from all selected elements
+    // other wise the saved pedal will display dashed borders
+    // for saved elements
+    function deselectEverything() {
+        let elems = document.querySelectorAll(".selected");
+        elems.forEach((e) => {
+            e.classList.toggle("selected");
+            //e.style.border = "2px solid red";
+        });
+
+        // remove background image is it has no src
+        let img = document.querySelector("#background-image");
+        if (img){
+            if ((img.src === undefined) || (img.src === "")) {
+                //console.log("### img.src = " + img.src);
+
+                // remove the elem
+                img.parentNode.removeChild(img);
+        }}
+        let labels = pedal.htmlComponent.querySelectorAll('label');
+        labels.forEach((l) => {
+            l.contentEditable = "false";
+        });
+
+        let elem = document.querySelector(".target-style-label");
+        if(elem) elem.style.border = "none";
+    }
+
+    function getElements(array, components) {
+
+        components.forEach(c => {
+        if(c.type === 'layout') {
+            getElements(array, c.components);
+        }else {
+            array.push(c.getDataForSave())
+        }
+      });
+
+    }
+
+    function preparePedal(pedal) {
+        //removeBorder(pedal.htmlComponent);
+
+        pedal.components.forEach(c => {
+            if(c.type === 'layout') {
+                return preparePedal(c);
+            }else {
+                //removeBorder(c.htmlContainer);
+            }
+        })
+    }
+
+    function removeBorder(element) {
+        element.style.removeProperty('border');
+    }
+
+    function getPedalConfig(pedal) {
+      let config = {
+        id: pedal.id,
+        name: pedal.name,
+        backgroundImageSrc: pedal.htmlComponent.style.backgroundImage,
+        color: pedal.htmlComponent.style.backgroundColor,
+        width: pedal.htmlComponent.style.width,
+        height: pedal.htmlComponent.style.height,
+        radius: pedal.htmlComponent.style.borderRadius,
+        /*
+        backgroundImageSrc: pedal.htmlComponent.getAttribute('background-image'),
+        color: pedal.htmlComponent.getAttribute("background-color"),
+        width: pedal.htmlComponent.getAttribute("width"),
+        height: pedal.htmlComponent.getAttribute("height"),
+        radius: pedal.htmlComponent.getAttribute("border-radius"),
+        //opacity: pedal.getAttribute("opacity"),
+        */
+        elements: []
+      };
+
+      getElements(config.elements, pedal.components);
+
+      /*for (let knob of this.knobs) {
+        config.elements.push(knob);
+      }
+
+      for (let icon of this.icons) {
+        config.elements.push(icon);
+      }
+
+      for (let label of this.labels) {
+        config.elements.push(label);
+      }
+
+      for (let switch_ of this.switches) {
+        config.elements.push(switch_);
+      }
+
+      for (let slider of this.sliders) {
+        config.elements.push(slider);
+      }*/
+
+      return config;
+    
+    }
+
+    function savePedal(generationType) {
+
+        deselectEverything();
+
+
+        const pedalName = pedal.name;
+  
+        if (pedalName == '') {
+            alert('You should enter the pedal name before saving !');
+            return;
+        }
+
+        preparePedal(pedal);
+        let config = getPedalConfig(pedal);
+
+        let http = new XMLHttpRequest();
+        let url = serverUrl + '/pedals';
+        let params = config;
+        http.open("POST", url, true);
+
+        http.setRequestHeader("Content-type", "application/json");
+
+        http.onreadystatechange = function () {
+            if (http.readyState == 4 && http.status == 200) {
+                alert('Saved successfully!');
+                pedal.pedalId = JSON.parse(http.responseText).id;
+                //displaySavedPedalsIds();
+            }
+        }
+        http.send(JSON.stringify(params));
+        generateCodeFunctionalPedalFetch(config.elements, generationType);
+    }
+
+    function refreshSavedPedalsConfigs() {
+        let request = new XMLHttpRequest();
+        request.open('GET', serverUrl + '/pedals', false);
+        request.send(null);
+        let pedalConfigs = JSON.parse(request.responseText);
+        savedPedalsConfigs = pedalConfigs;
+    }
+
+    /* function displaySavedPedalsIds() {
+
+        // Uptates the list of pedal configurations by fetching then from the server. 
+        refreshSavedPedalsConfigs();
+
+        // Gets the select element that displays the list of names of the saved pedal configurations. 
+        let loadPedalElem = document.querySelector('#load-pedal');
+
+        let oldVal = loadPedalElem.value;
+
+        // Flushes the select element to get rid of the old pedal configurations that have been generated
+        //during the last call to this function. If we don't flush it, the names of the new pedal configurations
+        //will be appended to the ones that has been fetched in the previous call to the function.
+        loadPedalElem.innerHTML = '';
+
+        for (let savedPedalConfig of savedPedalsConfigs) {
+            let savedPedalIdElem = document.createElement('option');
+            savedPedalIdElem.setAttribute('value', savedPedalConfig.id);
+            savedPedalIdElem.innerHTML = savedPedalConfig.name;
+
+            loadPedalElem.appendChild(savedPedalIdElem);
+        }
+
+        loadPedalElem.value = oldVal;
+
+    } */
+
+/*
+    function setSelectedElementLabel(value) {
+        let element = pedal.getSelectedElement();
+        element.label = value;
+        pedal.updateStyle_();
+    }
+
+    function setSelectedElementLabelColor(value) {
+        let element = pedal.getSelectedElement();
+        element.label_color = value;
+        pedal.updateStyle_();
+    }
+
+    function setSelectedElementLabelFontfamily(value) {
+        let element = pedal.getSelectedElement();
+        element.label_fontfamily = value;
+        pedal.updateStyle_();
+    }
+
+    function setSelectedElementLabelFontsize(value) {
+        let element = pedal.getSelectedElement();
+        element.label_fontsize = value;
+        pedal.updateStyle_();
+    }
+
+    function setSelectedElementValue(value) {
+        let element = pedal.getSelectedElement();
+        element.value = value;
+        pedal.updateStyle_();
+    }
+
+    function setSelectedElementModel(value) {
+        let element = pedal.getSelectedElement();
+        element.model = value;
+        pedal.updateStyle_();
+        selectKnob(pedal.getSelectedElement());
+    }
+
+    function setSelectedElementXPosition(xPosition) {
+        let element = pedal.getSelectedElement();
+        element.x = xPosition;
+        pedal.updateStyle_();
+    }
+
+    function setSelectedElementYPosition(yPosition) {
+        let element = pedal.getSelectedElement();
+        element.y = yPosition;
+        pedal.updateStyle_();
+    }
+
+    function setSelectedElementWidth(width) {
+        let keepRatio = document.querySelector("#keep-ratio").checked;
+
+
+        let element = pedal.getSelectedElement();
+        element.width = width;
+
+        if (keepRatio) {
+            element.height = element.width;
+            document.querySelector("#inspector-height").value = width;
+        }
+
+        pedal.updateStyle_();
+    }
+
+    function setSelectedElementHeight(height) {
+        let keepRatio = document.querySelector("#keep-ratio").checked;
+
+        let element = pedal.getSelectedElement();
+        element.height = height;
+
+        if (keepRatio) {
+            element.width = element.height;
+            document.querySelector("#inspector-width").value = height;
+
+        }
+
+        pedal.updateStyle_();
+    }
+
+    /*function updatePedalElementsSection() {
+
+        // Deleting the elements of all the sections.
+        for (let pedalElementType of pedal.getElementsTypes()) {
+            let section = getSectionByPedalElementType(pedalElementType);
+
+            if (!section) {
+                continue;
+            }
+
+            let firstChild;
+            while (firstChild = section.firstChild) {
+                section.removeChild(firstChild);
+            }
+        }
+
+
+        // Populating the sections.
+        for (let pedalElement of pedal.getElements()) {
+            let section = getSectionByPedalElementType(pedalElement.type);
+            if (!section) {
+                continue;
+            }
+
+            let idElem = document.createElement('div');
+            idElem.className = pedalElement.type + '_id';
+            idElem.innerHTML = pedalElement.id;
+            idElem.onclick = (e) => {
+                selectKnob(e.target.innerHTML);
+            }
+
+            section.appendChild(idElem);
+        }
+
+        // Select the pedal's selected element.
+        let selectedElement = pedal.getSelectedElement();
+        if (selectedElement) {
+            selectKnob(selectedElement.id);
+        }
+
+    }*/
+
+    function getSectionByPedalElementType(pedalElementType) {
+        let section = document.querySelector('#' + pedalElementType + '_section');
+
+        return section;
+    }
+
+    function updateInspector() {
+        pedal.getSelectedElement();
+    }
+
+    function selectKnob(knobId) {
+
+        /*
+        var knobs = document.getElementById('knob_section').childNodes;
+        var icons = document.getElementById('icon_section').childNodes;
+
+        for (let knob of knobs) {
+            // TODO: Remove.
+            if (knob.className)
+                knob.className = knob.className.replace('selected', '');
+            if (knob.innerHTML === knobId) {
+                knob.className += ' selected';
+            }
+        }
+
+        for (let icon of icons) {
+            // TODO: Remove.
+            if (icon.className)
+                icon.className = icon.className.replace('selected', '');
+            if (icon.innerHTML === knobId) {
+                icon.className += ' selected';
+            }
+        }
+
+        if (pedal.getSelectedElement().id != knobId) {
+            pedal.selectElement(knobId);
+        }*/
+
+
+        let knob = pedal.getSelectedElement();
+        let inspectorId = document.getElementById('inspector-id');
+        let inspectorLabel = document.getElementById('inspector-label');
+        let inspectorLabelColor = document.getElementById('inspector-label-color');
+        let inspectorLabelFontFamily = document.getElementById('inspector-label-font-family');
+        let inspectorLabelSize = document.getElementById('inspector-label-font-size');
+        let inspectorXPosition = document.getElementById('inspector-x-position');
+        let inspectorYPosition = document.getElementById('inspector-y-position');
+        let inspectorWidth = document.getElementById('inspector-width');
+        let inspectorHeight = document.getElementById('inspector-height');
+
+        let inspectorModel = document.getElementById('inspector-model');
+        let inspectorPreview = document.getElementById('inspector-preview');
+
+
+
+        inspectorLabel.value = knob.label;
+        inspectorLabelColor.value = knob.label_color;
+        inspectorLabelFontFamily.value = knob.label_fontfamily;
+        inspectorLabelSize.value = knob.label_fontsize;
+        inspectorXPosition.value = knob.x;
+        inspectorYPosition.value = knob.y;
+        inspectorWidth.value = knob.width || 0;
+        inspectorHeight.value = knob.height || 0;
+
+        inspectorModel.value = knob.model;
+
+        let inspector = document.getElementById('inspector');
+    }
+
+    function deleteSelectedElement() {
+        pedal.deleteSelectedElement();
+        updatePedalElementsSection();
+    }
+
+    function addSlider() {
+        pedal.addElement('slider');
+    }
+
+
+
+    function loadPedalConfig(value) {
+
+        newPedal();
+        for (let pedalConfig of savedPedalsConfigs) {
+            if (pedalConfig.id == value) {
+                pedal.loadConfig(pedalConfig);
+
+                let loadPedal = document.querySelector('#load-pedal');
+                loadPedal.value = value;
+            }
+        }
+
+        plugPedalToEditor();
+    }
+
+    function plugPedalToEditor() {
+        // Plug pedal to pedal details component
+        // OLD : let pedalDetails = document.querySelector('#editor-pedal-details');
+        let pedalDetails = document.querySelector('#new-editor');
+        let newPedalDetails = pedalDetails.cloneNode();
+        pedalDetails.parentNode.replaceChild(newPedalDetails, pedalDetails);
+        newPedalDetails.setEditablePedal(pedal);
+
+        console.log("plugPedalToEditor - 5")
+        // Plug pedal to element list component
+        let elementList = document.querySelector('#editor-element-list');
+        elementList.setEditablePedal(pedal);
+
+        // Plug pedal to inspector component
+        let inspector = document.querySelector('#editor-inspector');
+        inspector.setEditablePedal(pedal);
+    }
+
+    function getFirstChild(el) {
+        var firstChild = el.firstChild;
+
+        while (firstChild != null && firstChild.nodeType == 3) { // skip TextNodes
+            firstChild = firstChild.nextSibling;
+        }
+
+        return firstChild;
+    }
+
+    // Sends the main.html GUI file for the wap named currentWapName
+    // to the backend server. A dir is created if there is none already
+    // created for this WAP.
+    // It also copies asset files if necessary, and finally sends a message to the Faust IDE
+    // to ask for it to generate a binary.zip file with the DSP code. An async message will be 
+    // sent back by the faust IDE when ready (processed in the next listener defined after this
+    // function)
+    function generateCodeFunctionalPedalFetch(elements, generationType) {
+        this.generationType = generationType;
+        let url = serverUrl + '/generate' + generationType;        
+        let data = new FormData();
+        
+        // ------------------ WAM2 ------------------
+        if(generationType == "WAM2") {
+            console.log("[DEBUG] - WAM2 type generation");
+            functionalPedalGenerator = new FunctionalPedalGeneratorMichelWam2(pedal, elements);
+            //functionalPedalGenerator = new FunctionalPedalGeneratorMichelWam2(pedal);
+            console.log("=== generated ===")
+            data.append("generated", functionalPedalGenerator.generateFunctionalPedalCode(getPedalConfig(pedal).name));
+            console.log("=== wapName ===")
+            data.append("wapName", currentWapName);
+            console.log("=== wapCode ===")
+            data.append("wapCode", currentWapCode);
+            /**data.append("listOfAssetsUsedByPlugin", functionalPedalGenerator.editablePedal.assets);
+            console.log(functionalPedalGenerator.editablePedal.assets)*/
+            console.log("=== indexJS ===")
+            data.append("indexJS", functionalPedalGenerator.generateIndexJSFile(currentWapName));
+            console.log("=== listOfAssetsUsedByPlugin ===")
+            data.append("listOfAssetsUsedByPlugin", JSON.stringify(functionalPedalGenerator.getListOfAssetsUsedByThePlugin()));
+            console.log("======")
+
+            fetch(url, {
+                    method: "POST",
+                    body: data
+                })
+                .then((responseJSON) => {                
+                    responseJSON.json()
+                        .then(res => {
+                            //console.log(res.message);
+                            alert(res.message);
+                            $('#myModal4').modal('show');
+                            // show preview dialog with iframe...
+                            //https://mainline.i3s.unice.fr/PedalEditor/Back-End/functional-pedals/published/distortion/index.html
+                            let iFramePreview = document.querySelector('#iframeWapPreview');
+                            let pluginPreviewURL =
+                                "https://mainline.i3s.unice.fr/PedalEditor/Back-End/functional-pedals/published/" +
+                                currentWapName + "/index.html";
+
+                            setTimeout(function () {
+                                iFramePreview.src = pluginPreviewURL;
+                                let buttonLinkToPreview = document.querySelector("#linkToPluginPreview");
+                                buttonLinkToPreview.href = pluginPreviewURL;
+                            }, 1500);
+                        })
+                })
+                .catch(err => {
+                    console.log("err")
+                    console.log(err)
+                })
+
+            // 1 - SEND ASYNC MESSAGE TO FAUST EDITOR
+            //console.log("SENDING EXPORT MESSAGE TO FAUST EDITOR")
+            if (window.parent !== window) {
+                window.parent.postMessage({
+                    type: "export",
+                    plat: "web",
+                    arch: "wap"
+                }, "*")
+            }
+        }
+        // ------------------ WAP ------------------
+        else if(generationType == "WAP") {
+            console.log("[DEBUG] - WAP type generation");
+            //let url = serverUrl + '/generate' + generationType;        
+            let data = new FormData();
+
+    
+            functionalPedalGenerator = new FunctionalPedalGenerator(pedal, elements);
+            data.append("generated", functionalPedalGenerator.generateFunctionalPedalCode());
+            data.append("wapName", currentWapName);
+            data.append("wapCode", currentWapCode);
+
+            fetch(url, {
+                    method: "POST",
+                    body: data
+                })
+                .then((responseJSON) => {                
+                    responseJSON.json()
+                        .then(res => {
+                            //console.log(res.message);
+                            alert(res.message);
+                            $('#myModal4').modal('show');
+                            // show preview dialog with iframe...
+                            //https://mainline.i3s.unice.fr/PedalEditor/Back-End/functional-pedals/published/distortion/index.html
+                            let iFramePreview = document.querySelector('#iframeWapPreview');
+                            let pluginPreviewURL =
+                                "https://mainline.i3s.unice.fr/Back-End/functional-pedals/published/" +
+                                currentWapName + "/index.html";
+                            iFramePreview.src = pluginPreviewURL;
+                            let buttonLinkToPreview = document.querySelector("#linkToPluginPreview");
+                            buttonLinkToPreview.href = pluginPreviewURL;
+
+
+                            setTimeout(function () {
+                                iFramePreview.src = iFramePreview.src;
+                            }, 1500);
+                        })
+                })
+                .catch(err => {
+                    //console.log(err)
+                })
+
+            // 1 - SEND ASYNC MESSAGE TO FAUST EDITOR
+            //console.log("SENDING EXPORT MESSAGE TO FAUST EDITOR")
+            if (window.parent !== window) {
+                window.parent.postMessage({
+                    type: "export",
+                    plat: "web",
+                    arch: "wap"
+                }, "*")
+            }
+        }
+        else alert("Choose a correct generation type (WAM2 or WAP");
+    }
+
+    //window.onload = initializeFromMessagePostedByFaustIDE;
+
+    function waitUntilHtmlImportsLoaded(interval, callback) {
+        const getPromiseInstance = () => new Promise((resolve, reject) => {
+            //console.log("Checking if files have been imported...");
+            if (importsLoaded)
+                resolve("imports loaded");
+        });
+
+        let id = setInterval(() => {
+            getPromiseInstance().then((result) => {
+                //console.log(result);
+                clearInterval(id);
+                // continue...
+                callback(result);
+            })
+        }, interval);
+    }
+
+
+
+    // TRES IMPORTANT !!!!
+    function initializeFromMessagePostedByFaustIDE(data) {
+        /*
+        waitUntilHtmlImportsLoaded(1000, () => {
+            console.log("Ok, all fils imported, let's go on...")
+            continueInitializations();
+        });
+        */
+        continueInitializations();
+        
+        function continueInitializations() {
+            //console.log("initializeFromMessagePostedByFaustIDE")
+
+            let name = data.name;
+            //console.log("initializeFromMessagePostedByFaustIDE: name = " + name)
+            currentWapCode = data.code;
+
+            /* ####### Commenter la ligne de faustUI.WapName ci-dessous quand on n'utilise pas faust editor ########
+             */
+            faustUI.WapName = name.substr(0, name.lastIndexOf("."));
+            //console.log("initializeFromMessagePostedByFaustIDE: faustUI.WapName = " + faustUI.WapName)
+
+            currentWapName = faustUI.WapName;
+            //console.log("initializeFromMessagePostedByFaustIDE: currentWapName = " + currentWapName)
+            //console.log("code = " + data.code);
+            //Mettre en commentaire init() quand on utilise faust editor, bug à régler
+            //init();
+            faustUI = data.ui;
+
+            // BMT important comment
+            // OLD
+            const pedalContainer = document.createElement('div');
+            pedalContainer.id = 'pedal-container';
+            const wrapper = document.getElementById('wrapper');
+            wrapper.appendChild(pedalContainer)       
+            window.pedalContainer = true;
+            window.pedalName = currentWapName;
+                     
+            return;/* Test
+            const pedalContainer = document.createElement('my-pedal');
+            pedalContainer.id = 'pedal-container';
+            const wrapper = document.getElementById('wrapper');
+            wrapper.appendChild(pedalContainer)       
+            window.pedalContainer = true;
+            window.pedalName = currentWapName;
+                     
+            return;*/
+            //console.log("faustUI = ", faustUI)
+            //setFaustUIFromUrl();
+            //console.log("faustUi après setFaustUIFromUrl= ", faustUI)
+
+
+            //displaySavedPedalsIds();
+
+            /* bt_buildIt.addEventListener('click', () => {
+
+            checkMetadata(document.querySelector("#urlPlugin").value);
+            }); */
+
+            /* MICHEL BUFFA
+            let faust = document.querySelector('#editor-faust'),
+                faustClone = faust.cloneNode(true);
+            faust.parentNode.replaceChild(faustClone, faust);
+
+            faust = document.querySelector('#editor-faust');
+            */
+
+
+            /*faust.addEventListener('create-pedal', (e) => {
+            newPedal();
+            let pedalConfig = {
+            name: "First",
+            color: "#7caeff",
+            width: e.detail.width,
+            height: e.detail.height,
+            radius: "10",
+            opacity: "1",
+            elements: e.detail.elements
+            };
+            //console.log(e.detail);
+            pedal.loadConfig(pedalConfig);
+            });*/
+            if (window.faustUI) {
+                //console.log("### faustUI present ! ####")
+                //console.log(window.faustUI);
+
+
+                //let detail = faust.pedalConfigFromUI(window.faustUI, currentWapName);
+                faust = new FaustUIParser();
+
+                let detail = faust.pedalConfigFromUI(window.faustUI, currentWapName);
+                let pedalConfig = {
+                    name: currentWapName,
+                    color: "#7caeff",
+                    width: detail.width,
+                    height: detail.height,
+                    radius: "10",
+                    opacity: "1",
+                    elements: detail.elements
+                };
+                //console.log(detail);
+                //console.log("PEDALCONFIG = ", pedalConfig);
+
+                newPedal(null, true);
+
+                //currentWapName = pedalConfig.name;
+                pedal.loadConfig(pedalConfig);
+
+
+
+
+
+            }
+        }
+    }
+    // 2 - SENT BY FAUST IDE WHEN THE BINARY.ZIP FILE IS READY TO BE SENT TO BACK-END WAP SERVER
+    window.addEventListener("message", (e) => {
+        const data = e.data;
+
+        if (data.type === "build") {
+            initializeFromMessagePostedByFaustIDE(data);
+        }
+
+        if (data.type === "exported") {
+            let wapBinaryDotZipFileURL = data.href
+            //console.log(wapBinaryDotZipFileURL);
+
+            // Let's send a message to the backend server so that it gets
+            // this file, and unzip it in the same dir the main.html GUI file + assets
+            // have been created
+            let url = serverUrl + '/addBinaryDotZip' + this.generationType;
+            let data2 = new FormData();
+            data2.append("url", wapBinaryDotZipFileURL);
+            data2.append("wapName", currentWapName);
+
+            fetch(url, {
+                    method: "POST",
+                    body: data2
+                })
+                .then((responseJSON) => {
+                    responseJSON.json()
+                        .then(res => {
+                            //console.log(res.message);
+                            alert(res.message);
+                        })
+                })
+                .catch(err => {
+                    //console.log(err)
+                })
+        }
+    });
+
+    function downloadWap() {
+        var url = 'https://mainline.i3s.unice.fr/download?wapName=' + currentWapName;
+        //console.log("downloading zip for " + currentWapName);
+
+        fetch(url)
+            .then(response => {
+                console.log("response")
+                console.log(response)
+                return response.json();
+            }).then(responseJS => {
+                //console.log(responseJS.msg);
+                let zipURL = responseJS.zipURL;
+
+                downloadURI(zipURL, currentWapName + ".zip");
+            })
+    }
+
+    function downloadURI(uri, name) {
+        var link = document.createElement("a");
+        link.download = name;
+        link.href = uri;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        delete link;
+    }
+
+    // Sends the binary.zip to the Back-End
+    function publish(downPath, pedalName) {
+        var http = new XMLHttpRequest();
+        var url = 'https://mainline.i3s.unice.fr/generated-wap';
+        var params = {
+            url: downPath,
+            pedalName: "current"
+        };
+
+        http.open('POST', url, true);
+
+        //Send the proper header information along with the request
+        http.setRequestHeader('Content-type', "application/json");
+
+        http.onreadystatechange = function () { //Call a function when the state changes.
+            if (http.readyState == 4 && http.status == 200) {
+                alert(http.responseText);
+            }
+        }
+
+        http.send(JSON.stringify(params));
+    }
+
+    function toggleHidden(elem) {
+        if (elem.style.display === 'none') {
+            elem.style.display = 'block';
+        } else {
+            elem.style.display = 'none';
+        }
+    }
+
+    function toggleEditorPedalDetails() {
+        let elem = document.querySelector('#editor-pedal-details');
+        toggleHidden(elem);
+    }
+
+
+
+    // And of the forked content
+    // -----------------------------Json fetching part ---------------------------//
+
+    function checkMetadata(baseURL) {
+        fetch(baseURL + "/main.json").then(responseJSON => {
+            return responseJSON.json();
+        }).then(metadata => {
+            let name = metadata.name
+            let className = metadata.vendor + metadata.name;
+            loadPlugin(className, name, baseURL);
+        }).catch((e) => {
+            //console.log(e);
+        });
+    }
+
+    // add the script tag and load the plugin 
+    function loadPlugin(className, name, baseURL) {
+        let scriptURL = baseURL + "/main.js";
+
+        // if we are here this means that the script is not present. Add it to the document
+        let script = document.createElement("script");
+        script.src = scriptURL;
+
+        script.onload = function () {
+            // Once the script has been loaded instanciate the plugin
+            getDescriptorFromPlugin(className, name, baseURL);
+        }
+        // will be executed before the onload above...
+        document.head.appendChild(script);
+    }
+
+    // instanciate the plugin 
+    /* function getDescriptorFromPlugin(className, name, baseURL) {
+
+         var plugin = new window[className](ctx, baseURL);
+         //console.log(plugin);
+
+         plugin.load().then((node) => {
+             plugin.loadGui().then((elem) => {
+                 let descriptor = node.getDescriptor();
+                 let dimensions = elem.properties;
+                 let nbParam = Object.keys(descriptor).length;
+                 var count = 0;
+                 let hoffset = 50;
+                 let voffset = 60;
+                 //console.log(descriptor);
+
+                 //--------------------------------- JSON edition PART -------------------------//
+                 let extendedDescriptor = {
+                     "name": name,
+                     "backgroundImageSrc": "image2.png",
+                     "color": "#AB2E24",
+                     "width": dimensions.dataWidth.value,
+                     "height": dimensions.dataHeight.value,
+                     "radius": "10",
+                     "elements": []
+                 }
+
+
+                 for (var param in descriptor) {
+                     // 2* because we want by default two ranges of knobs
+                     let horizontalRange = Math.ceil(count % (nbParam / 2));
+                     let verticalRange = Math.floor(count / (nbParam / 2));
+                     //console.log(param, horizontalRange, verticalRange);
+
+                     // Here we do a little normalisation because we have to select by ID later
+
+                     if (descriptor.hasOwnProperty(param)) {
+                         var element = {
+                             "id": param.toLowerCase().replace(/ /g, "").replace('\/', ""),
+                             "x": hoffset * horizontalRange,
+                             "y": voffset * verticalRange,
+                             "width": 40,
+                             "height": 40,
+                             "model": "Carbon.png",
+                             "value": descriptor[param].defaultValue,
+                             "min": descriptor[param].minValue,
+                             "max": descriptor[param].maxValue,
+                             "label": param,
+                             "label_fontfamily": "Verdana",
+                             "label_fontsize": "7",
+                             "label_color": "000000",
+                             "type": "knob"
+                         }
+
+                     }
+                     count++;
+                     extendedDescriptor.elements.push(element);
+
+
+                 }
+                 var elemlabel = {
+                     "x": 20,
+                     "y": 130,
+                     "label": name,
+                     "label_fontfamily": 'Comic Sans MS',
+                     "label_fontsize": '14',
+                     "label_color": 'ffffff',
+                     "type": 'label'
+                 }
+                 extendedDescriptor.elements.push(elemlabel);
+                 //-------------------- END of JSON Edition -------------------- //
+
+                 newPedal(extendedDescriptor);
+                 //console.log(extendedDescriptor);
+
+
+             });
+             delete node;
+
+         });
+
+         delete plugin;
+
+     }*/
+</script>
+
+</html>

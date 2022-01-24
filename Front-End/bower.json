@@ -1,0 +1,26 @@
+{
+  "name": "pedalboard",
+  "version": "1.0.0",
+  "description": "Web Component example using Polymer",
+  "authors": [
+    "WebComponents.org"
+  ],
+  "main": "index.html",
+  "keywords": [
+    "polymer",
+    "web-components"
+  ],
+  "ignore": [
+    "**/.*",
+    "bower_components"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.0.0",
+    "webaudio-controls": "g200kg/webaudio-controls",
+    "color-picker": "fooloomanzoo/color-picker#^2.0.8"
+  },
+  "resolutions": {
+    "polymer": "^1.0.0",
+    "webcomponentsjs": "^1.1.0"
+  }
+}
